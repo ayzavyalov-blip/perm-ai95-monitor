@@ -30,7 +30,7 @@ TBANK_PUBLIC_STATUS_PATH = OUT_DIR / "tbank_public_status.json"
 USER_AGENT = (
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
     "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 "
-    "PermAI95Monitor/0.9"
+    "PermAI95Monitor/1.0"
 )
 
 REQUEST_TIMEOUT = 25
@@ -149,10 +149,6 @@ def fetch(url: str) -> tuple[int | None, str, str | None]:
         return None, "", repr(exc)
 
 
-def row_mentions_ai95(text: str) -> bool:
-    return bool(re.search(r"(АИ\s*[-]?\s*95|AI\s*[-]?\s*95|бензин\s*95|95\s*бензин)", text, re.I))
-
-
 def load_json_array(path: Path) -> list[dict[str, Any]]:
     if not path.exists():
         return []
@@ -173,13 +169,12 @@ def load_json_object(path: Path) -> dict[str, Any]:
         return {}
 
 
-def static_gdebenz_fallback() -> SourceResult:
-    urls = [
-        "https://gdebenz.ru/perm",
-        "https://gdebenz.ru/fuel/ai-95",
-        "https://gdebenz.ru/",
-    ]
+def row_mentions_ai95(text: str | None) -> bool:
+    return bool(re.search(r"(АИ\s*[-]?\s*95|AI\s*[-]?\s*95|бензин\s*95|95\s*бензин|\b95\b)", text or "", re.I))
 
+
+def static_gdebenz_fallback() -> SourceResult:
+    urls = ["https://gdebenz.ru/perm", "https://gdebenz.ru/fuel/ai-95", "https://gdebenz.ru/"]
     checked_at = now_iso()
     errors = []
 
@@ -210,11 +205,7 @@ def static_gdebenz_fallback() -> SourceResult:
             status="static_general_only",
             checked_at=checked_at,
             http_status=http_status,
-            message=(
-                "Статическая страница доступна, но карточки АЗС не извлечены. "
-                "Основной сбор должен идти через collect-gdebenz-public.js. "
-                + ("Общий сигнал: " + "; ".join(signals) if signals else "")
-            ),
+            message="Статическая страница доступна, но карточки АЗС не извлечены. " + ("Общий сигнал: " + "; ".join(signals) if signals else ""),
             observations=[],
             raw_hash=text_hash(text[:200000]),
         )
@@ -237,7 +228,7 @@ def parse_gdebenz() -> SourceResult:
     if rows:
         normalized = []
         for item in rows:
-            network = clean(item.get("network")) or brand_from_text(item.get("station_name")) or brand_from_text(item.get("address"))
+            network = clean(item.get("network")) or brand_from_text(item.get("station_name")) or brand_from_text(item.get("address")) or brand_from_text(item.get("raw_text"))
             address = clean(item.get("address")) or None
             lat = item.get("lat")
             lon = item.get("lon")
@@ -270,6 +261,7 @@ def parse_gdebenz() -> SourceResult:
                 "amount_rub": None,
                 "confidence": min(0.90, confidence),
                 "note": item.get("note") or "ГдеБЕНЗ: карточка после фильтров.",
+                "raw_text": item.get("raw_text"),
             })
 
         message = status_payload.get("message") or f"ГдеБЕНЗ UI: собрано карточек: {len(normalized)}."
@@ -317,7 +309,7 @@ def load_tbank_public() -> SourceResult:
         lon = item.get("lon")
         q, precise = address_quality(address, lat, lon)
 
-        network = clean(item.get("network")) or brand_from_text(item.get("station_name")) or brand_from_text(address)
+        network = clean(item.get("network")) or brand_from_text(item.get("station_name")) or brand_from_text(address) or brand_from_text(item.get("raw_text"))
         station_name = clean(item.get("station_name")) or network or "АЗС"
 
         try:
@@ -507,6 +499,43 @@ def build_candidates(gdebenz_result: SourceResult, tbank_result: SourceResult) -
     return candidates[:10]
 
 
+def build_diagnostics(gdebenz_result: SourceResult, tbank_result: SourceResult) -> list[dict[str, Any]]:
+    rows = []
+    for g in gdebenz_result.observations or []:
+        best_t = None
+        best_score = 0.0
+        best_reasons = []
+        for t in tbank_result.observations or []:
+            s, reasons = match_score(g, t)
+            if s > best_score:
+                best_score = s
+                best_t = t
+                best_reasons = reasons
+
+        rows.append({
+            "station_name": g.get("station_name"),
+            "network": g.get("network"),
+            "address": g.get("address"),
+            "queue": g.get("queue"),
+            "marks_count": g.get("marks_count"),
+            "marks_hours": g.get("marks_hours"),
+            "distance_km": g.get("distance_km"),
+            "address_quality": g.get("address_quality"),
+            "confidence": g.get("confidence"),
+            "best_tbank_match_score": round(best_score, 3),
+            "best_tbank_match": {
+                "network": best_t.get("network"),
+                "address": best_t.get("address"),
+                "address_quality": best_t.get("address_quality"),
+            } if best_t else None,
+            "match_reasons": best_reasons,
+            "not_recommended_reason": "Недостаточно точная связка gdebenz + tbank_fuel для рекомендации к поездке.",
+        })
+
+    rows.sort(key=lambda x: (x.get("best_tbank_match_score") or 0, x.get("confidence") or 0), reverse=True)
+    return rows[:12]
+
+
 def external_source(name: str, url: str, role: str, message: str) -> SourceResult:
     return SourceResult(
         source=name,
@@ -557,6 +586,7 @@ def main() -> int:
     gdebenz_result = parse_gdebenz()
     tbank_result = load_tbank_public()
     candidates = build_candidates(gdebenz_result, tbank_result)
+    diagnostics = build_diagnostics(gdebenz_result, tbank_result)
     traffic_targets = make_traffic_targets(candidates)
 
     source_results = [
@@ -566,7 +596,7 @@ def main() -> int:
             "yandex_maps_traffic",
             "https://yandex.ru/maps/50/perm/probki/",
             "traffic",
-            "Яндекс Карты используются после отбора АЗС. В URL принудительно включается слой l=map,trf.",
+            "Яндекс Карты используются после отбора АЗС. Для общего обзора открывается /probki с центром Перми.",
         ),
         external_source(
             "2gis_traffic",
@@ -579,12 +609,12 @@ def main() -> int:
     generated_at = now_iso()
 
     payload = {
-        "schema_version": "0.9",
+        "schema_version": "1.0",
         "city": CITY,
         "fuel": FUEL,
         "generated_at": generated_at,
         "pipeline": [
-            "1. gdebenz UI: город Пермь, фильтры Где есть топливо + 95 + Все + Готово",
+            "1. gdebenz UI: /perm, город Пермь, фильтры Где есть топливо + 95 + Все + Готово",
             "2. tbank_fuel: публичная карта Т-Банка на основе транзакционных сигналов",
             "3. match: сеть + точный адрес/координаты; street_only не считается достаточным",
             "4. yandex_maps_traffic / 2gis_traffic: карта и пробки по отобранным АЗС",
@@ -598,6 +628,7 @@ def main() -> int:
             "do_not_recommend_without_precise_address_or_coordinates": True,
             "minimum_match_score": MIN_MATCH_SCORE,
             "street_only_is_not_enough": True,
+            "diagnostic_rows_are_not_recommendations": True,
             "freshness_threshold_minutes": {
                 "strong": 20,
                 "medium": 60,
@@ -607,6 +638,7 @@ def main() -> int:
         "source_results": [asdict(src) for src in source_results],
         "matched_candidates": candidates,
         "recommendations": candidates,
+        "diagnostic_gdebenz_rows": diagnostics,
         "traffic_targets": traffic_targets,
         "traffic_screenshots": {
             "mode": "station_specific_precise",
@@ -614,8 +646,8 @@ def main() -> int:
             "note": "Скриншоты создаются по точным кандидатам. Если точных кандидатов нет, создаётся общий диагностический скрин Перми.",
         },
         "operator_message": (
-            "Логика уточнена: gdebenz теперь собирается через UI с городом Пермь и фильтрами. "
-            "Для рекомендаций нужны сеть и точный адрес/координаты, затем сверка с Т-Банком."
+            "Логика уточнена: gdebenz собирается через UI и сохраняет пошаговые скриншоты. "
+            "Если точных рекомендаций нет, показываются диагностические строки gdebenz, но они не считаются рекомендацией."
         ),
     }
 

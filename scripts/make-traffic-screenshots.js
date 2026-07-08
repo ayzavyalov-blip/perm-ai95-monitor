@@ -52,14 +52,18 @@ function hasCoords(target) {
 }
 
 function yandexUrl(target) {
+  if (target.is_fallback || target.station_id === 'perm-general') {
+    return 'https://yandex.ru/maps/50/perm/probki/?ll=56.2342%2C58.0105&z=11';
+  }
+
   const text = encodeURIComponent(target.query);
   if (hasCoords(target)) {
     const lon = encodeURIComponent(target.lon);
     const lat = encodeURIComponent(target.lat);
     return `https://yandex.ru/maps/50/perm/?ll=${lon}%2C${lat}&z=17&l=map%2Ctrf&pt=${lon},${lat},pm2rdm&text=${text}`;
   }
-  // Обязательно указываем ll Перми, иначе Яндекс иногда открывает воду/пустой центр.
-  return `https://yandex.ru/maps/50/perm/search/${text}/?ll=56.2502%2C58.0105&z=13&l=map%2Ctrf`;
+
+  return `https://yandex.ru/maps/50/perm/search/${text}/?ll=56.2342%2C58.0105&z=13&l=map%2Ctrf`;
 }
 
 function gisUrl(target) {
@@ -67,7 +71,7 @@ function gisUrl(target) {
   if (hasCoords(target)) {
     return `https://2gis.ru/perm/search/${text}?m=${target.lon}%2C${target.lat}%2F17&traffic`;
   }
-  return `https://2gis.ru/perm/search/${text}?m=56.2502%2C58.0105%2F12&traffic`;
+  return `https://2gis.ru/perm/search/${text}?m=56.2342%2C58.0105%2F12&traffic`;
 }
 
 function writeStatus(payload) {
@@ -114,23 +118,6 @@ async function closeYandexPopups(page) {
   }).catch(() => {});
 }
 
-async function tryEnableYandexTraffic(page) {
-  const selectors = [
-    '[aria-label*="Пробки"]',
-    'button[aria-label*="Пробки"]',
-    'button:has-text("Пробки")',
-    'div:has-text("Пробки")'
-  ];
-
-  for (const selector of selectors) {
-    const clicked = await clickIfVisible(page, selector, 1000);
-    if (clicked) {
-      await page.waitForTimeout(3000);
-      break;
-    }
-  }
-}
-
 async function pass2gisBrowserWarning(page) {
   const selectors = [
     'button:has-text("Пропустить обновление браузера")',
@@ -169,7 +156,6 @@ async function writeFallbackImage(browser, source, target, screenshotPath, messa
           <p><b>Источник:</b> ${source}</p>
           <p><b>АЗС:</b> ${target.label}</p>
           <p><b>Запрос:</b> <code>${target.query}</code></p>
-          <p><b>Адресная точность:</b> ${target.address_quality}</p>
           <p><b>Ошибка:</b> <code>${String(message).slice(0, 1200)}</code></p>
           <p>Это не подтверждает и не опровергает наличие АИ-95. Проверьте карту вручную.</p>
         </div>
@@ -196,17 +182,16 @@ async function capture(browser, source, target, url, screenshotPath) {
 
   try {
     await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 70000 });
-    await page.waitForTimeout(9000);
+    await page.waitForTimeout(12000);
 
     if (source === 'yandex_maps_traffic') {
       await closeYandexPopups(page);
-      await tryEnableYandexTraffic(page);
-      await page.waitForTimeout(15000);
+      await page.waitForTimeout(8000);
     }
 
     if (source === '2gis_traffic') {
       await pass2gisBrowserWarning(page);
-      await page.waitForTimeout(16000);
+      await page.waitForTimeout(12000);
     }
 
     await page.screenshot({ path: screenshotPath, fullPage: true });
@@ -224,7 +209,7 @@ async function capture(browser, source, target, url, screenshotPath) {
       started_at: startedAt,
       finished_at: new Date().toISOString(),
       message: source === 'yandex_maps_traffic'
-        ? 'Скриншот сохранён. Яндекс открыт с ll=Пермь и l=map,trf для слоя пробок.'
+        ? 'Скриншот сохранён. Для общего обзора использован /probki с центром Перми.'
         : 'Скриншот сохранён. Это визуальный слой пробок, не подтверждение наличия АИ-95.'
     };
   } catch (e) {
