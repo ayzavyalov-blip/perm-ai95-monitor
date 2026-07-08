@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-08T12:53:31.636Z",
+  "generated_at": "2026-07-08T13:09:39.944Z",
   "mode": "station_specific_precise",
   "note": "Скриншоты пробок являются вспомогательным визуальным слоем и не подтверждают наличие АИ-95.",
   "targets": [
@@ -26,8 +26,8 @@
       "ok": true,
       "status": "screenshot_saved",
       "screenshot_path": "screenshots/stations/perm-general-yandex.png",
-      "started_at": "2026-07-08T12:52:23.075Z",
-      "finished_at": "2026-07-08T12:52:53.837Z",
+      "started_at": "2026-07-08T13:08:32.798Z",
+      "finished_at": "2026-07-08T13:09:03.258Z",
       "message": "Скриншот сохранён. Яндекс открыт с параметром l=map,trf для слоя пробок."
     },
     {
@@ -39,8 +39,8 @@
       "ok": true,
       "status": "screenshot_saved",
       "screenshot_path": "screenshots/stations/perm-general-2gis.png",
-      "started_at": "2026-07-08T12:52:53.837Z",
-      "finished_at": "2026-07-08T12:53:31.603Z",
+      "started_at": "2026-07-08T13:09:03.258Z",
+      "finished_at": "2026-07-08T13:09:39.913Z",
       "message": "Скриншот сохранён. Это визуальный слой пробок, не подтверждение наличия АИ-95."
     }
   ]
