@@ -1,0 +1,16 @@
+{
+  "generated_at": "2026-07-08T13:18:39.748Z",
+  "url": "https://gdebenz.ru/",
+  "screenshot_path": "screenshots/gdebenz-public.png",
+  "ok": false,
+  "status": "no_station_rows_from_ui",
+  "city_set": true,
+  "filters_applied": true,
+  "cards_found": 0,
+  "observations_count": 0,
+  "precise_count": 0,
+  "house_count": 0,
+  "street_only_count": 0,
+  "message": "ГдеБЕНЗ UI открыт, но карточки после фильтра не извлечены. Проверьте screenshots/gdebenz-public.png.",
+  "page_error": null
+}
