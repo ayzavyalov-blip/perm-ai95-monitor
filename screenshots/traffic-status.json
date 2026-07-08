@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-08T11:42:23.783Z",
+  "generated_at": "2026-07-08T11:59:32.569Z",
   "note": "Скриншоты пробок являются вспомогательным визуальным слоем и не подтверждают наличие АИ-95.",
   "results": [
     {
@@ -8,8 +8,8 @@
       "ok": true,
       "status": "screenshot_saved",
       "screenshot_path": "screenshots/yandex-traffic.png",
-      "started_at": "2026-07-08T11:41:22.311Z",
-      "finished_at": "2026-07-08T11:41:53.732Z",
+      "started_at": "2026-07-08T11:58:31.949Z",
+      "finished_at": "2026-07-08T11:59:02.736Z",
       "message": "Скриншот сохранён. Это визуальный слой пробок, не подтверждение наличия АИ-95."
     },
     {
@@ -18,8 +18,8 @@
       "ok": true,
       "status": "screenshot_saved",
       "screenshot_path": "screenshots/2gis-traffic.png",
-      "started_at": "2026-07-08T11:41:53.732Z",
-      "finished_at": "2026-07-08T11:42:23.757Z",
+      "started_at": "2026-07-08T11:59:02.736Z",
+      "finished_at": "2026-07-08T11:59:32.553Z",
       "message": "Скриншот сохранён. Это визуальный слой пробок, не подтверждение наличия АИ-95."
     }
   ]
