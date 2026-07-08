@@ -19,11 +19,6 @@
     table { width: 100%; border-collapse: collapse; background: white; font-size: 14px; table-layout: fixed; }
     th, td { border-bottom: 1px solid #e2e8f0; padding: 10px; text-align: left; vertical-align: top; overflow-wrap: anywhere; }
     th { background: #f1f5f9; font-weight: 700; }
-    th:nth-child(1), td:nth-child(1) { width: 130px; }
-    th:nth-child(2), td:nth-child(2) { width: 130px; }
-    th:nth-child(3), td:nth-child(3) { width: 160px; }
-    th:nth-child(4), td:nth-child(4) { width: 70px; }
-    th:nth-child(6), td:nth-child(6) { width: 80px; }
     code { background: #f1f5f9; padding: 2px 5px; border-radius: 5px; }
     .small { font-size: 13px; }
     .pill { display: inline-block; padding: 3px 8px; border-radius: 999px; background: #e2e8f0; margin: 2px 4px 2px 0; font-size: 12px; }
@@ -32,11 +27,13 @@
     .button:hover { background: #1e40af; }
     .top-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
     .secondary-button { display: inline-block; padding: 10px 14px; border-radius: 8px; background: #e2e8f0; color: #0f172a; text-decoration: none; font-weight: 700; }
-    .secondary-button:hover { background: #cbd5e1; }
-    .nowrap { white-space: nowrap; }
     .traffic-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px; margin-top: 12px; }
     .traffic-image { width: 100%; max-height: 760px; object-fit: contain; border: 1px solid #e2e8f0; border-radius: 12px; background: #f8fafc; }
     .image-caption { font-size: 13px; color: #64748b; margin-top: 6px; }
+    .station-buttons { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
+    .station-button { border: 1px solid #cbd5e1; background: #f8fafc; padding: 8px 10px; border-radius: 8px; cursor: pointer; font-weight: 700; }
+    .station-button.active { background: #1d4ed8; color: white; border-color: #1d4ed8; }
+    .pipeline { margin: 0; padding-left: 20px; }
     @media (max-width: 720px) {
       body { padding: 14px; }
       h1 { font-size: 24px; }
@@ -60,32 +57,43 @@
       <a id="runWorkflowLink" class="button" href="#" target="_blank" rel="noopener">Открыть запуск GitHub Actions</a>
       <a id="repoLink" class="secondary-button" href="#" target="_blank" rel="noopener">Открыть репозиторий</a>
       <a class="secondary-button" href="data/latest.json" target="_blank" rel="noopener">Открыть latest.json</a>
+      <a class="secondary-button" href="data/tbank_public_status.json" target="_blank" rel="noopener">Открыть статус Т-Банка</a>
     </div>
-    <p class="muted">Прямой запуск без перехода на GitHub не включён: для него нужен GitHub token, а токен нельзя хранить в статической странице.</p>
   </div>
 
   <div id="summary" class="card">Загрузка данных...</div>
 
   <div class="card">
+    <h2>Логика отбора</h2>
+    <ol class="pipeline">
+      <li><b>gdebenz</b>: смотрим, что пишут люди по АИ-95.</li>
+      <li><b>tbank_fuel</b>: сопоставляем с публичной картой Т-Банка на основе транзакционных сигналов.</li>
+      <li><b>карты</b>: строим скриншоты Яндекс/2ГИС только по отобранным АЗС, чтобы видеть подъезды и пробки.</li>
+    </ol>
+  </div>
+
+  <div class="card">
     <h2>Рекомендации</h2>
-    <div class="muted">Цена полностью исключена из агента. Пробка не считается самостоятельным подтверждением наличия АИ-95.</div>
+    <div class="muted">Цена полностью исключена. Рекомендация появляется только при совпадении сигнала gdebenz и tbank_fuel.</div>
     <div id="recommendations"></div>
   </div>
 
   <div class="card">
-    <h2>Пробки, автоскриншоты</h2>
-    <p class="muted">Скриншоты создаются в GitHub Actions через Playwright. Это только визуальный слой: пробка у АЗС не подтверждает наличие АИ-95.</p>
+    <h2>Карта и пробки по отобранным АЗС</h2>
+    <p class="muted">Переключайтесь между АЗС. Скриншоты являются только визуальным слоем: пробка не подтверждает наличие АИ-95.</p>
     <div id="trafficStatus" class="muted">Загрузка статуса скриншотов...</div>
+    <div id="stationButtons" class="station-buttons"></div>
+    <div id="selectedStationTitle" class="muted"></div>
     <div class="traffic-grid">
       <div>
         <h3>Яндекс Карты / Пробки</h3>
         <img id="yandexTrafficImage" class="traffic-image" alt="Скриншот Яндекс Карт с пробками">
-        <div class="image-caption">Если вместо карты видна ошибка, значит GitHub Actions не смог открыть карту или сайт ограничил автоматический доступ.</div>
+        <div id="yandexCaption" class="image-caption"></div>
       </div>
       <div>
         <h3>2ГИС / Пробки</h3>
         <img id="gisTrafficImage" class="traffic-image" alt="Скриншот 2ГИС с пробками">
-        <div class="image-caption">Используйте этот скрин только как дополнительную проверку маршрута и возможной очереди у въезда на АЗС.</div>
+        <div id="gisCaption" class="image-caption"></div>
       </div>
     </div>
   </div>
@@ -102,7 +110,7 @@
       <li>Отметка 20-60 минут: средний сигнал.</li>
       <li>Старше 60 минут: нужен звонок или второй источник.</li>
       <li>Пробка у въезда на АЗС: вспомогательный сигнал очереди, но не доказательство наличия АИ-95.</li>
-      <li>Цена не используется и не отображается.</li>
+      <li>Т-Банк: публичный транзакционный сигнал наличия/активности, но итоговая поездка всё равно требует проверки конкретной АЗС.</li>
       <li>Автоскриншот карты: визуальная подсказка, а не структурированные данные о наличии топлива.</li>
     </ul>
   </div>
@@ -152,8 +160,8 @@ function shortText(s, maxLen = 360) {
 }
 
 function statusClass(status) {
-  if (['parsed_partial', 'screenshot_saved'].includes(status)) return 'status-ok';
-  if (['map_dynamic_no_station_rows', 'manual_or_app_required', 'unknown'].includes(status)) return 'status-warn';
+  if (['parsed_partial', 'parsed_public_site', 'screenshot_saved', 'map_after_selection'].includes(status)) return 'status-ok';
+  if (['map_dynamic_no_station_rows', 'manual_or_app_required', 'unknown', 'no_public_station_rows'].includes(status)) return 'status-warn';
   return 'status-bad';
 }
 
@@ -164,22 +172,17 @@ function formatDate(value) {
   return d.toLocaleString('ru-RU');
 }
 
-function hasHardRecommendation(data) {
-  const rows = data.recommendations || [];
-  return rows.some(r => Number(r.confidence || 0) >= 0.6 && r.status !== 'unknown');
-}
-
 function renderSummary(data) {
-  const hardRecommendation = hasHardRecommendation(data);
+  const candidates = data.matched_candidates || [];
   document.getElementById('summary').innerHTML = `
     <h2>Последняя проверка</h2>
     <div>Город: <b>${esc(data.city)}</b></div>
     <div>Топливо: <b>${esc(data.fuel)}</b></div>
     <div>Время генерации: <b>${esc(formatDate(data.generated_at))}</b></div>
     <div style="margin-top:10px">
-      ${hardRecommendation
-        ? '<span class="status-ok">Есть кандидаты, но перед выездом проверьте свежесть и источник.</span>'
-        : '<span class="status-warn">Нет достаточно надёжной конкретной АЗС для рекомендации.</span>'}
+      ${candidates.length
+        ? `<span class="status-ok">Есть ${candidates.length} кандидат(ов) после сопоставления gdebenz и tbank_fuel.</span>`
+        : '<span class="status-warn">Нет АЗС, прошедших двойную проверку gdebenz + tbank_fuel.</span>'}
     </div>
     <p class="muted">${esc(data.operator_message || '')}</p>
   `;
@@ -187,9 +190,15 @@ function renderSummary(data) {
 
 function renderRecommendations(data) {
   const rows = data.recommendations || [];
+
   if (!rows.length) {
     document.getElementById('recommendations').innerHTML = `
-      <p class="status-warn">Конкретных АЗС для поездки нет. Нет свежего машинного подтверждения по конкретной точке.</p>
+      <p class="status-warn">
+        Конкретных АЗС для поездки нет. Нужны одновременно: сигнал людей на gdebenz и публичный транзакционный сигнал Т-Банка по той же АЗС.
+      </p>
+      <p class="muted">
+        Проверьте <code>data/tbank_public_status.json</code> и скрин <code>screenshots/tbank-public.png</code>, если Т-Банк не дал машинные строки.
+      </p>
     `;
     return;
   }
@@ -203,7 +212,7 @@ function renderRecommendations(data) {
             <th>Адрес</th>
             <th>Статус</th>
             <th>Доверие</th>
-            <th>Источники</th>
+            <th>Совпадение</th>
             <th>Действие</th>
           </tr>
         </thead>
@@ -213,20 +222,97 @@ function renderRecommendations(data) {
               <td>${esc(r.station_name || 'нет данных')}</td>
               <td>${esc(r.address || 'нет данных')}</td>
               <td class="${statusClass(r.status || 'unknown')}">${esc(r.status || 'unknown')}</td>
-              <td class="nowrap">${Math.round(Number(r.confidence || 0) * 100)}%</td>
-              <td>${(r.sources || []).map(s => `<span class="pill">${esc(s)}</span>`).join('')}</td>
+              <td>${Math.round(Number(r.confidence || 0) * 100)}%</td>
+              <td>${Math.round(Number(r.match_score || 0) * 100)}%</td>
               <td>${esc(r.action || '')}</td>
             </tr>
           `).join('')}
         </tbody>
       </table>
     </div>
-    <p class="muted">Если статус unknown или доверие ниже 60%, это не является рекомендацией ехать на АЗС.</p>
   `;
+}
+
+let trafficState = null;
+let selectedTargetId = null;
+
+function groupedTrafficResults(status) {
+  const groups = {};
+  for (const r of (status.results || [])) {
+    const id = r.target_id || 'perm-general';
+    if (!groups[id]) groups[id] = { target_id: id, label: r.target_label || id, yandex: null, gis: null, raw: [] };
+    groups[id].raw.push(r);
+    if (r.source === 'yandex_maps_traffic') groups[id].yandex = r;
+    if (r.source === '2gis_traffic') groups[id].gis = r;
+  }
+  return Object.values(groups);
+}
+
+function selectTrafficTarget(targetId) {
+  if (!trafficState) return;
+
+  const groups = groupedTrafficResults(trafficState);
+  const group = groups.find(g => g.target_id === targetId) || groups[0];
+
+  if (!group) return;
+
+  selectedTargetId = group.target_id;
+
+  for (const btn of document.querySelectorAll('.station-button')) {
+    btn.classList.toggle('active', btn.dataset.targetId === selectedTargetId);
+  }
+
+  document.getElementById('selectedStationTitle').innerHTML = `<b>Выбрано:</b> ${esc(group.label)}`;
+
+  const ts = Date.now();
+
+  if (group.yandex && group.yandex.screenshot_path) {
+    document.getElementById('yandexTrafficImage').src = `${group.yandex.screenshot_path}?ts=${ts}`;
+    document.getElementById('yandexCaption').textContent = group.yandex.message || '';
+  }
+
+  if (group.gis && group.gis.screenshot_path) {
+    document.getElementById('gisTrafficImage').src = `${group.gis.screenshot_path}?ts=${ts}`;
+    document.getElementById('gisCaption').textContent = group.gis.message || '';
+  }
+}
+
+function renderTrafficStatus() {
+  loadTrafficStatus()
+    .then(status => {
+      trafficState = status;
+      const groups = groupedTrafficResults(status);
+
+      document.getElementById('trafficStatus').innerHTML = `
+        <div>Время создания: <b>${esc(formatDate(status.generated_at))}</b></div>
+        <div class="muted">${esc(status.note || '')}</div>
+      `;
+
+      const buttons = document.getElementById('stationButtons');
+      if (!groups.length) {
+        buttons.innerHTML = '<span class="status-warn">Нет скриншотов по АЗС.</span>';
+        return;
+      }
+
+      buttons.innerHTML = groups.map((g, idx) => `
+        <button class="station-button ${idx === 0 ? 'active' : ''}" data-target-id="${esc(g.target_id)}" onclick="selectTrafficTarget('${esc(g.target_id)}')">
+          ${esc(g.label)}
+        </button>
+      `).join('');
+
+      selectTrafficTarget(groups[0].target_id);
+    })
+    .catch(err => {
+      document.getElementById('trafficStatus').innerHTML = `
+        <span class="status-warn">Скриншоты пока не созданы. Запустите GitHub Actions workflow.</span>
+        <div class="muted">${esc(err.message)}</div>
+      `;
+    });
 }
 
 function renderSources(data) {
   const rows = data.source_results || [];
+
   if (!rows.length) {
     document.getElementById('sources').innerHTML = '<p class="status-warn">Источники не загружены.</p>';
     return;
@@ -246,52 +332,24 @@ function renderSources(data) {
           </tr>
         </thead>
         <tbody>
-          ${rows.map(s => {
-            const fullMessage = s.message || '';
-            const shownMessage = shortText(fullMessage);
-            return `
-              <tr>
-                <td><b>${esc(s.source)}</b></td>
-                <td>${esc(s.role)}</td>
-                <td class="${statusClass(s.status)}">${esc(s.status)}</td>
-                <td>${esc(s.http_status || '')}</td>
-                <td class="small" title="${esc(fullMessage)}">${esc(shownMessage)}</td>
-                <td><a href="${esc(s.url)}" target="_blank" rel="noopener">открыть</a></td>
-              </tr>
-            `;
-          }).join('')}
+          ${rows.map(s => `
+            <tr>
+              <td><b>${esc(s.source)}</b></td>
+              <td>${esc(s.role)}</td>
+              <td class="${statusClass(s.status)}">${esc(s.status)}</td>
+              <td>${esc(s.http_status || '')}</td>
+              <td class="small" title="${esc(s.message || '')}">${esc(shortText(s.message || ''))}</td>
+              <td><a href="${esc(s.url)}" target="_blank" rel="noopener">открыть</a></td>
+            </tr>
+          `).join('')}
         </tbody>
       </table>
     </div>
   `;
 }
 
-function renderTrafficImages() {
-  const ts = Date.now();
-  document.getElementById('yandexTrafficImage').src = `screenshots/yandex-traffic.png?ts=${ts}`;
-  document.getElementById('gisTrafficImage').src = `screenshots/2gis-traffic.png?ts=${ts}`;
-
-  loadTrafficStatus()
-    .then(status => {
-      const rows = status.results || [];
-      document.getElementById('trafficStatus').innerHTML = `
-        <div>Время создания: <b>${esc(formatDate(status.generated_at))}</b></div>
-        <div style="margin-top:6px">
-          ${rows.map(r => `<span class="${statusClass(r.status)}">${esc(r.source)}: ${esc(r.status)}</span>`).join(' | ')}
-        </div>
-        <p class="muted">${esc(status.note || '')}</p>
-      `;
-    })
-    .catch(err => {
-      document.getElementById('trafficStatus').innerHTML = `
-        <span class="status-warn">Скриншоты пока не созданы. Запустите GitHub Actions workflow.</span>
-        <div class="muted">${esc(err.message)}</div>
-      `;
-    });
-}
-
 setupLinks();
-renderTrafficImages();
+renderTrafficStatus();
 
 loadData()
   .then(data => {

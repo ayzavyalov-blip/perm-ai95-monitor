@@ -11,7 +11,7 @@ permissions:
 jobs:
   update:
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 35
 
     steps:
       - name: Checkout
@@ -26,13 +26,14 @@ jobs:
           echo "=== DNS diagnostics ==="
           getent hosts gdebenz.ru || true
           getent hosts www.gdebenz.ru || true
+          getent hosts toplivo.tbank.ru || true
           getent hosts yandex.ru || true
           getent hosts 2gis.ru || true
 
           echo "=== HTTP diagnostics ==="
           curl -I -L --max-time 20 https://gdebenz.ru/perm || true
           curl -I -L --max-time 20 https://gdebenz.ru/fuel/ai-95 || true
-          curl -I -L --max-time 20 https://gdebenz.ru/ || true
+          curl -I -L --max-time 20 https://toplivo.tbank.ru/ || true
           curl -I -L --max-time 20 https://yandex.ru/maps/50/perm/probki/ || true
           curl -I -L --max-time 20 "https://2gis.ru/perm?traffic" || true
 
@@ -42,47 +43,18 @@ jobs:
           sudo apt-get update -y
           sudo apt-get install -y dnsutils
 
-          echo "=== dig through public resolvers ==="
-          dig +short A gdebenz.ru @1.1.1.1 || true
-          dig +short A gdebenz.ru @8.8.8.8 || true
-          dig +short A www.gdebenz.ru @1.1.1.1 || true
-          dig +short A www.gdebenz.ru @8.8.8.8 || true
-
           GDEBENZ_IP="$(dig +short A gdebenz.ru @1.1.1.1 | grep -E '^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$' | head -n1)"
           if [ -z "$GDEBENZ_IP" ]; then
             GDEBENZ_IP="$(dig +short A gdebenz.ru @8.8.8.8 | grep -E '^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$' | head -n1)"
           fi
-
           if [ -z "$GDEBENZ_IP" ]; then
-            echo "Public resolvers did not return an IP. Using temporary fallback IP 80.87.196.21."
             GDEBENZ_IP="80.87.196.21"
           fi
 
           echo "Using gdebenz.ru IP: $GDEBENZ_IP"
           echo "$GDEBENZ_IP gdebenz.ru www.gdebenz.ru" | sudo tee -a /etc/hosts
-
-          echo "=== hosts after DNS fix ==="
           getent hosts gdebenz.ru || true
-          getent hosts www.gdebenz.ru || true
-
-          echo "=== HTTP after DNS fix ==="
           curl -I -L --max-time 20 https://gdebenz.ru/perm || true
-          curl -I -L --max-time 20 https://gdebenz.ru/fuel/ai-95 || true
-          curl -I -L --max-time 20 https://gdebenz.ru/ || true
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-
-      - name: Install Python dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-
-      - name: Collect fuel data
-        run: |
-          python scripts/collect.py
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -94,7 +66,26 @@ jobs:
           npm install --no-audit --no-fund
           npx playwright install --with-deps chromium
 
-      - name: Make traffic screenshots
+      - name: Collect TBank public fuel signals
+        run: |
+          mkdir -p data screenshots
+          node scripts/collect-tbank-public.js
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Merge gdebenz and TBank signals
+        run: |
+          python scripts/collect.py
+
+      - name: Make station traffic screenshots
         run: |
           mkdir -p screenshots
           node scripts/make-traffic-screenshots.js
@@ -103,6 +94,6 @@ jobs:
         run: |
           git config user.name "ai95-monitor-bot"
           git config user.email "ai95-monitor-bot@users.noreply.github.com"
-          git add data/latest.json data/history/ screenshots/
-          git diff --cached --quiet && echo "No data changes" || git commit -m "Update AI-95 data and traffic screenshots"
+          git add data/latest.json data/history/ data/tbank_observations.json data/tbank_public_status.json screenshots/
+          git diff --cached --quiet && echo "No data changes" || git commit -m "Update AI-95 candidates from gdebenz and TBank"
           git push
