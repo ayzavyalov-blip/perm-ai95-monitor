@@ -1,0 +1,40 @@
+name: Update AI-95 data
+
+on:
+  schedule:
+    - cron: "17 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Collect data
+        run: |
+          python scripts/collect.py
+
+      - name: Commit updated data
+        run: |
+          git config user.name "ai95-monitor-bot"
+          git config user.email "ai95-monitor-bot@users.noreply.github.com"
+          git add data/latest.json data/history/
+          git diff --cached --quiet && echo "No data changes" || git commit -m "Update AI-95 data"
+          git push

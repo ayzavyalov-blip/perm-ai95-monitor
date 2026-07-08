@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <title>АИ-95 Пермь: мониторинг</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    :root {
+      font-family: Arial, sans-serif;
+      color: #1f2937;
+      background: #f8fafc;
+    }
+    body {
+      margin: 0;
+      padding: 24px;
+    }
+    .container {
+      max-width: 1180px;
+      margin: 0 auto;
+    }
+    h1 {
+      margin: 0 0 8px;
+      font-size: 28px;
+    }
+    .muted {
+      color: #64748b;
+      font-size: 14px;
+    }
+    .card {
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      padding: 16px;
+      margin: 16px 0;
+      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+    }
+    .status-ok {
+      color: #166534;
+      font-weight: 700;
+    }
+    .status-warn {
+      color: #92400e;
+      font-weight: 700;
+    }
+    .status-bad {
+      color: #991b1b;
+      font-weight: 700;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      font-size: 14px;
+    }
+    th, td {
+      border-bottom: 1px solid #e2e8f0;
+      padding: 10px;
+      text-align: left;
+      vertical-align: top;
+    }
+    th {
+      background: #f1f5f9;
+      font-weight: 700;
+    }
+    code {
+      background: #f1f5f9;
+      padding: 2px 5px;
+      border-radius: 5px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 12px;
+    }
+    .small {
+      font-size: 13px;
+    }
+    .pill {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: #e2e8f0;
+      margin: 2px 4px 2px 0;
+      font-size: 12px;
+    }
+    a {
+      color: #1d4ed8;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>АИ-95 Пермь: мониторинг</h1>
+  <div class="muted">Статическая витрина GitHub Pages. Данные обновляются через GitHub Actions.</div>
+
+  <div id="summary" class="card">Загрузка данных...</div>
+
+  <div class="card">
+    <h2>Рекомендации</h2>
+    <div class="muted">Цена и пробка не считаются самостоятельным подтверждением наличия АИ-95.</div>
+    <div id="recommendations"></div>
+  </div>
+
+  <div class="card">
+    <h2>Статус источников</h2>
+    <div id="sources"></div>
+  </div>
+
+  <div class="card">
+    <h2>Правила интерпретации</h2>
+    <ul>
+      <li>Свежая отметка до 20 минут: сильный сигнал.</li>
+      <li>Отметка 20-60 минут: средний сигнал.</li>
+      <li>Старше 60 минут: нужен звонок или второй источник.</li>
+      <li>Пробка у въезда на АЗС: вспомогательный сигнал очереди, но не доказательство наличия АИ-95.</li>
+      <li>Опубликованная цена: не доказательство наличия АИ-95.</li>
+    </ul>
+  </div>
+</div>
+
+<script>
+async function loadData() {
+  const res = await fetch('data/latest.json?ts=' + Date.now());
+  if (!res.ok) throw new Error('Не удалось загрузить data/latest.json');
+  return await res.json();
+}
+
+function esc(s) {
+  return String(s ?? '').replace(/[&<>"']/g, ch => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  }[ch]));
+}
+
+function statusClass(status) {
+  if (['parsed_partial'].includes(status)) return 'status-ok';
+  if (['map_dynamic_no_station_rows', 'no_station_rows', 'manual_or_app_required'].includes(status)) return 'status-warn';
+  return 'status-bad';
+}
+
+function renderSummary(data) {
+  const gen = new Date(data.generated_at).toLocaleString('ru-RU');
+  const recCount = (data.recommendations || []).length;
+  const hardRecommendation = recCount > 0 && (data.recommendations || []).some(r => Number(r.confidence || 0) >= 0.6);
+
+  document.getElementById('summary').innerHTML = `
+    <h2>Последняя проверка</h2>
+    <div>Город: <b>${esc(data.city)}</b></div>
+    <div>Топливо: <b>${esc(data.fuel)}</b></div>
+    <div>Время генерации: <b>${esc(gen)}</b></div>
+    <div style="margin-top: 10px">
+      ${hardRecommendation
+        ? '<span class="status-ok">Есть кандидаты, но перед выездом проверьте свежесть и источник.</span>'
+        : '<span class="status-warn">Нет достаточно надёжной конкретной АЗС для рекомендации.</span>'
+      }
+    </div>
+    <p class="muted">${esc(data.operator_message || '')}</p>
+  `;
+}
+
+function renderRecommendations(data) {
+  const rows = data.recommendations || [];
+  if (!rows.length) {
+    document.getElementById('recommendations').innerHTML = `
+      <p class="status-warn">Конкретных АЗС для поездки нет. Источники не отдали свежие станционные данные в пригодном формате.</p>
+    `;
+    return;
+  }
+
+  document.getElementById('recommendations').innerHTML = `
+    <table>
+      <thead>
+        <tr>
+          <th>АЗС</th>
+          <th>Адрес</th>
+          <th>Статус</th>
+          <th>Цена</th>
+          <th>Доверие</th>
+          <th>Источники</th>
+          <th>Действие</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${rows.map(r => `
+          <tr>
+            <td>${esc(r.station_name)}</td>
+            <td>${esc(r.address || 'нет данных')}</td>
+            <td>${esc(r.status || 'unknown')}</td>
+            <td>${r.price_rub ? esc(r.price_rub) + ' руб.' : 'нет данных'}</td>
+            <td>${Math.round(Number(r.confidence || 0) * 100)}%</td>
+            <td>${(r.sources || []).map(s => `<span class="pill">${esc(s)}</span>`).join('')}</td>
+            <td>${esc(r.action || '')}</td>
+          </tr>
+        `).join('')}
+      </tbody>
+    </table>
+  `;
+}
+
+function renderSources(data) {
+  const rows = data.source_results || [];
+  document.getElementById('sources').innerHTML = `
+    <table>
+      <thead>
+        <tr>
+          <th>Источник</th>
+          <th>Роль</th>
+          <th>Статус</th>
+          <th>HTTP</th>
+          <th>Сообщение</th>
+          <th>Ссылка</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${rows.map(s => `
+          <tr>
+            <td><b>${esc(s.source)}</b></td>
+            <td>${esc(s.role)}</td>
+            <td class="${statusClass(s.status)}">${esc(s.status)}</td>
+            <td>${esc(s.http_status || '')}</td>
+            <td class="small">${esc(s.message)}</td>
+            <td><a href="${esc(s.url)}" target="_blank" rel="noopener">открыть</a></td>
+          </tr>
+        `).join('')}
+      </tbody>
+    </table>
+  `;
+}
+
+loadData()
+  .then(data => {
+    renderSummary(data);
+    renderRecommendations(data);
+    renderSources(data);
+  })
+  .catch(err => {
+    document.getElementById('summary').innerHTML = `<span class="status-bad">${esc(err.message)}</span>`;
+  });
+</script>
+</body>
+</html>
