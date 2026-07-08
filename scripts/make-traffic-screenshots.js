@@ -25,9 +25,7 @@ function safeId(value) {
 
 function readLatest() {
   const latestPath = path.join(process.cwd(), 'data', 'latest.json');
-  if (!fs.existsSync(latestPath)) {
-    return { traffic_targets: [] };
-  }
+  if (!fs.existsSync(latestPath)) return { traffic_targets: [] };
   return JSON.parse(fs.readFileSync(latestPath, 'utf8'));
 }
 
@@ -35,33 +33,40 @@ function buildTargets() {
   const latest = readLatest();
   const inputTargets = Array.isArray(latest.traffic_targets) ? latest.traffic_targets : [];
 
-  if (inputTargets.length > 0) {
-    return inputTargets.map((t, index) => ({
-      station_id: safeId(t.station_id || `station-${index + 1}`),
-      label: t.label || t.query || `АЗС ${index + 1}`,
-      query: t.query || t.label || 'АЗС АИ-95 Пермь',
-      confidence: t.confidence,
-      sources: t.sources || [],
-      is_fallback: t.station_id === 'perm-general'
-    }));
+  return inputTargets.map((t, index) => ({
+    station_id: safeId(t.station_id || `station-${index + 1}`),
+    label: t.label || t.query || `АЗС ${index + 1}`,
+    query: t.query || t.label || 'АЗС АИ-95 Пермь',
+    lat: Number.isFinite(Number(t.lat)) ? Number(t.lat) : null,
+    lon: Number.isFinite(Number(t.lon)) ? Number(t.lon) : null,
+    address_quality: t.address_quality || 'unknown',
+    map_ready: Boolean(t.map_ready),
+    confidence: t.confidence,
+    sources: t.sources || [],
+    is_fallback: t.station_id === 'perm-general'
+  }));
+}
+
+function hasCoords(target) {
+  return Number.isFinite(target.lat) && Number.isFinite(target.lon);
+}
+
+function yandexUrl(target) {
+  const text = encodeURIComponent(target.query);
+  if (hasCoords(target)) {
+    const lon = encodeURIComponent(target.lon);
+    const lat = encodeURIComponent(target.lat);
+    return `https://yandex.ru/maps/50/perm/?ll=${lon}%2C${lat}&z=17&l=map%2Ctrf&pt=${lon},${lat},pm2rdm&text=${text}`;
   }
-
-  return [{
-    station_id: 'perm-general',
-    label: 'Пермь: общий диагностический обзор',
-    query: 'АЗС АИ-95 Пермь',
-    confidence: null,
-    sources: [],
-    is_fallback: true
-  }];
+  return `https://yandex.ru/maps/50/perm/search/${text}/?l=map%2Ctrf&z=16`;
 }
 
-function yandexUrl(query) {
-  return `https://yandex.ru/maps/50/perm/search/${encodeURIComponent(query)}/?ll=56.2502%2C58.0105&z=14&traffic=1`;
-}
-
-function gisUrl(query) {
-  return `https://2gis.ru/perm/search/${encodeURIComponent(query)}?traffic`;
+function gisUrl(target) {
+  const text = encodeURIComponent(target.query);
+  if (hasCoords(target)) {
+    return `https://2gis.ru/perm/search/${text}?m=${target.lon}%2C${target.lat}%2F17&traffic`;
+  }
+  return `https://2gis.ru/perm/search/${text}?traffic`;
 }
 
 function writeStatus(payload) {
@@ -92,8 +97,24 @@ async function closeYandexPopups(page) {
     '[aria-label="Close"]'
   ];
 
+  for (const selector of selectors) await clickIfVisible(page, selector);
+}
+
+async function tryEnableYandexTraffic(page) {
+  // Основной способ - URL l=map,trf. Здесь резерв: пробуем нажать кнопку/слой "Пробки".
+  const selectors = [
+    '[aria-label*="Пробки"]',
+    'button[aria-label*="Пробки"]',
+    'button:has-text("Пробки")',
+    'div:has-text("Пробки")'
+  ];
+
   for (const selector of selectors) {
-    await clickIfVisible(page, selector);
+    const clicked = await clickIfVisible(page, selector, 1000);
+    if (clicked) {
+      await page.waitForTimeout(3000);
+      break;
+    }
   }
 }
 
@@ -135,6 +156,7 @@ async function writeFallbackImage(browser, source, target, screenshotPath, messa
           <p><b>Источник:</b> ${source}</p>
           <p><b>АЗС:</b> ${target.label}</p>
           <p><b>Запрос:</b> <code>${target.query}</code></p>
+          <p><b>Адресная точность:</b> ${target.address_quality}</p>
           <p><b>Ошибка:</b> <code>${String(message).slice(0, 1200)}</code></p>
           <p>Это не подтверждает и не опровергает наличие АИ-95. Проверьте карту вручную.</p>
         </div>
@@ -161,16 +183,17 @@ async function capture(browser, source, target, url, screenshotPath) {
 
   try {
     await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 70000 });
-    await page.waitForTimeout(8000);
+    await page.waitForTimeout(9000);
 
     if (source === 'yandex_maps_traffic') {
       await closeYandexPopups(page);
-      await page.waitForTimeout(12000);
+      await tryEnableYandexTraffic(page);
+      await page.waitForTimeout(15000);
     }
 
     if (source === '2gis_traffic') {
       await pass2gisBrowserWarning(page);
-      await page.waitForTimeout(15000);
+      await page.waitForTimeout(16000);
     }
 
     await page.screenshot({ path: screenshotPath, fullPage: true });
@@ -187,7 +210,9 @@ async function capture(browser, source, target, url, screenshotPath) {
       screenshot_path: rel(screenshotPath),
       started_at: startedAt,
       finished_at: new Date().toISOString(),
-      message: 'Скриншот сохранён. Это визуальный слой пробок, не подтверждение наличия АИ-95.'
+      message: source === 'yandex_maps_traffic'
+        ? 'Скриншот сохранён. Яндекс открыт с параметром l=map,trf для слоя пробок.'
+        : 'Скриншот сохранён. Это визуальный слой пробок, не подтверждение наличия АИ-95.'
     };
   } catch (e) {
     await context.close();
@@ -225,10 +250,10 @@ async function main() {
     const yandexPath = path.join(stationScreenshotsDir, `${id}-yandex.png`);
     const gisPath = path.join(stationScreenshotsDir, `${id}-2gis.png`);
 
-    const yandexResult = await capture(browser, 'yandex_maps_traffic', target, yandexUrl(target.query), yandexPath);
+    const yandexResult = await capture(browser, 'yandex_maps_traffic', target, yandexUrl(target), yandexPath);
     results.push(yandexResult);
 
-    const gisResult = await capture(browser, '2gis_traffic', target, gisUrl(target.query), gisPath);
+    const gisResult = await capture(browser, '2gis_traffic', target, gisUrl(target), gisPath);
     results.push(gisResult);
 
     if (results.length === 2) {
@@ -238,7 +263,7 @@ async function main() {
 
     writeStatus({
       generated_at: new Date().toISOString(),
-      mode: 'station_specific',
+      mode: 'station_specific_precise',
       note: 'Скриншоты пробок являются вспомогательным визуальным слоем и не подтверждают наличие АИ-95.',
       targets,
       results
@@ -249,7 +274,7 @@ async function main() {
 
   writeStatus({
     generated_at: new Date().toISOString(),
-    mode: 'station_specific',
+    mode: 'station_specific_precise',
     note: 'Скриншоты пробок являются вспомогательным визуальным слоем и не подтверждают наличие АИ-95.',
     targets,
     results
@@ -262,7 +287,7 @@ main().catch(e => {
   ensureDir();
   writeStatus({
     generated_at: new Date().toISOString(),
-    mode: 'station_specific',
+    mode: 'station_specific_precise',
     note: 'Traffic screenshot script failed before completing.',
     targets: [],
     results: [{

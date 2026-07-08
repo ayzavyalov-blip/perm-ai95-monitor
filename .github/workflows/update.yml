@@ -17,27 +17,22 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Network diagnostics before DNS fix
+      - name: Network diagnostics
         continue-on-error: true
         run: |
-          echo "=== resolv.conf ==="
-          cat /etc/resolv.conf || true
-
           echo "=== DNS diagnostics ==="
           getent hosts gdebenz.ru || true
-          getent hosts www.gdebenz.ru || true
           getent hosts toplivo.tbank.ru || true
           getent hosts yandex.ru || true
           getent hosts 2gis.ru || true
 
           echo "=== HTTP diagnostics ==="
           curl -I -L --max-time 20 https://gdebenz.ru/perm || true
-          curl -I -L --max-time 20 https://gdebenz.ru/fuel/ai-95 || true
           curl -I -L --max-time 20 https://toplivo.tbank.ru/ || true
-          curl -I -L --max-time 20 https://yandex.ru/maps/50/perm/probki/ || true
+          curl -I -L --max-time 20 "https://yandex.ru/maps/50/perm/?l=map%2Ctrf" || true
           curl -I -L --max-time 20 "https://2gis.ru/perm?traffic" || true
 
-      - name: Try to fix gdebenz DNS through public resolvers
+      - name: Try to fix gdebenz DNS
         continue-on-error: true
         run: |
           sudo apt-get update -y
@@ -95,5 +90,5 @@ jobs:
           git config user.name "ai95-monitor-bot"
           git config user.email "ai95-monitor-bot@users.noreply.github.com"
           git add data/latest.json data/history/ data/tbank_observations.json data/tbank_public_status.json screenshots/
-          git diff --cached --quiet && echo "No data changes" || git commit -m "Update AI-95 candidates from gdebenz and TBank"
+          git diff --cached --quiet && echo "No data changes" || git commit -m "Update AI-95 precise candidates and traffic screenshots"
           git push

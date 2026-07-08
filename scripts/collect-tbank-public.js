@@ -17,71 +17,193 @@ function clean(value) {
   return String(value || '').replace(/\s+/g, ' ').trim();
 }
 
+function normalize(value) {
+  return clean(value).toLowerCase().replace(/ё/g, 'е');
+}
+
 function hasAi95(text) {
-  return /АИ\s*[-]?\s*95|AI\s*[-]?\s*95|95\s*бензин/i.test(String(text || ''));
+  return /АИ\s*[-]?\s*95|AI\s*[-]?\s*95|95\s*бензин|бензин\s*95/i.test(String(text || ''));
 }
 
 function findAddress(text) {
-  const m = String(text || '').match(/((ул\.|улица|шоссе|проспект|пр-т|тракт|дорога|бульвар|переулок)[^,;"']{3,120})/i);
+  const m = String(text || '').match(/((ул\.|улица|шоссе|проспект|пр-т|тракт|дорога|бульвар|переулок|посёлок|поселок|микрорайон)[^,;"']{3,140})/i);
   return m ? clean(m[1]) : null;
+}
+
+function findHouse(text) {
+  const m = String(text || '').match(/\b(\d{1,4}[а-яa-z]?([\/-]\d{1,4}[а-яa-z]?)?)\b/i);
+  return m ? clean(m[1]) : null;
+}
+
+function hasHouseNumber(address) {
+  return /\b\d{1,4}[а-яa-z]?([\/-]\d{1,4}[а-яa-z]?)?\b/i.test(String(address || ''));
 }
 
 function findBrand(text) {
-  const m = String(text || '').match(/(ЛУКОЙЛ|Газпромнефть|Газпром|Нефтехимпром|Экойл|Ликом|Teboil|Роснефть|Get Petrol|Башнефть|Татнефть)/i);
-  return m ? clean(m[1]) : null;
+  const m = String(text || '').match(/(ЛУКОЙЛ|Лукойл|Газпромнефть|Газпром|Нефтехимпром|Экойл|Ликом|Teboil|Роснефть|Get Petrol|Башнефть|Татнефть)/i);
+  if (!m) return null;
+  const value = clean(m[1]);
+  if (/лукойл/i.test(value)) return 'ЛУКОЙЛ';
+  return value;
+}
+
+function parseNumber(value) {
+  if (value === null || value === undefined) return null;
+  const num = Number(String(value).replace(',', '.'));
+  return Number.isFinite(num) ? num : null;
+}
+
+function validPermLatLon(lat, lon) {
+  return Number.isFinite(lat) && Number.isFinite(lon) && lat > 57.4 && lat < 58.6 && lon > 55.3 && lon < 57.2;
+}
+
+function extractLatLon(obj) {
+  if (!obj || typeof obj !== 'object') return null;
+
+  const keyPairs = [
+    ['lat', 'lon'], ['lat', 'lng'],
+    ['latitude', 'longitude'],
+    ['geoLat', 'geoLon'], ['geo_lat', 'geo_lon'],
+    ['y', 'x']
+  ];
+
+  for (const [latKey, lonKey] of keyPairs) {
+    if (obj[latKey] !== undefined && obj[lonKey] !== undefined) {
+      const lat = parseNumber(obj[latKey]);
+      const lon = parseNumber(obj[lonKey]);
+      if (validPermLatLon(lat, lon)) return { lat, lon };
+      if (validPermLatLon(lon, lat)) return { lat: lon, lon: lat };
+    }
+  }
+
+  for (const containerKey of ['location', 'geo', 'geometry', 'point', 'position', 'coordinates']) {
+    const v = obj[containerKey];
+    if (!v) continue;
+
+    if (Array.isArray(v) && v.length >= 2) {
+      const a = parseNumber(v[0]);
+      const b = parseNumber(v[1]);
+      if (validPermLatLon(a, b)) return { lat: a, lon: b };
+      if (validPermLatLon(b, a)) return { lat: b, lon: a };
+    }
+
+    if (typeof v === 'object') {
+      const nested = extractLatLon(v);
+      if (nested) return nested;
+    }
+  }
+
+  return null;
+}
+
+function addressQuality(address, lat, lon) {
+  if (validPermLatLon(lat, lon)) return 'coordinate';
+  if (address && hasHouseNumber(address)) return 'house';
+  if (address) return 'street_only';
+  return 'unknown';
 }
 
 function pushObservation(list, item) {
-  const key = `${item.station_name || ''}|${item.address || ''}|${item.fuel || ''}`.toLowerCase();
-  if (!item.station_name && !item.address) return;
-  if (list.some(x => `${x.station_name || ''}|${x.address || ''}|${x.fuel || ''}`.toLowerCase() === key)) return;
-  list.push(item);
+  const quality = addressQuality(item.address, item.lat, item.lon);
+
+  // Отбрасываем совсем пустые строки.
+  if (!item.station_name && !item.address && !item.lat) return;
+
+  const key = [
+    normalize(item.network || item.station_name),
+    normalize(item.address),
+    item.lat ? Number(item.lat).toFixed(5) : '',
+    item.lon ? Number(item.lon).toFixed(5) : ''
+  ].join('|');
+
+  if (list.some(x => [
+    normalize(x.network || x.station_name),
+    normalize(x.address),
+    x.lat ? Number(x.lat).toFixed(5) : '',
+    x.lon ? Number(x.lon).toFixed(5) : ''
+  ].join('|') === key)) return;
+
+  list.push({
+    ...item,
+    address_quality: quality,
+    is_precise: quality === 'coordinate' || quality === 'house'
+  });
 }
 
-function walkJson(value, out, sourceUrl) {
-  if (!value || out.length >= 80) return;
+function looksLikeStationObject(value) {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
+  const text = normalize(JSON.stringify(value).slice(0, 6000));
+  return (
+    /азс|fuel|gas|station|топлив|бензин|аи[-\s]?95|лукойл|газпром|роснефть|нефтехимпром/.test(text)
+  );
+}
+
+function walkJson(value, out, sourceUrl, depth = 0) {
+  if (!value || out.length >= 120 || depth > 12) return;
 
   if (Array.isArray(value)) {
-    for (const item of value) walkJson(item, out, sourceUrl);
+    for (const item of value) walkJson(item, out, sourceUrl, depth + 1);
     return;
   }
 
   if (typeof value !== 'object') return;
 
-  const text = clean(JSON.stringify(value).slice(0, 5000));
-  const stationName =
-    value.name || value.title || value.brand || value.stationName || value.gasStationName || value.organizationName;
-  const address =
-    value.address || value.fullAddress || value.locationAddress || value.addressText || value.subtitle;
-  const fuel =
-    value.fuel || value.fuelType || value.product || value.mark || value.oilType || (hasAi95(text) ? 'АИ-95' : null);
+  if (looksLikeStationObject(value)) {
+    const text = clean(JSON.stringify(value).slice(0, 7000));
+    const coords = extractLatLon(value) || {};
 
-  const status =
-    value.status || value.availability || value.available || value.forecast || value.predict || value.presence || value.hasFuel;
+    const rawName =
+      value.name || value.title || value.brand || value.stationName || value.gasStationName ||
+      value.organizationName || value.shortName || value.companyName;
 
-  const updatedAt =
-    value.updatedAt || value.updateTime || value.lastTransactionAt || value.lastPaymentAt || value.lastPurchaseAt || value.lastOperationAt;
+    const rawAddress =
+      value.address || value.fullAddress || value.locationAddress || value.addressText ||
+      value.subtitle || value.description;
 
-  const inferredName = stationName || findBrand(text);
-  const inferredAddress = address || findAddress(text);
+    const network = findBrand(rawName) || findBrand(text);
+    const stationName = clean(rawName || network || 'АЗС');
+    const address = clean(rawAddress || findAddress(text) || '');
 
-  if ((inferredName || inferredAddress) && (hasAi95(text) || fuel || status !== undefined)) {
+    const fuel =
+      value.fuel || value.fuelType || value.product || value.mark || value.oilType ||
+      (hasAi95(text) ? 'АИ-95' : 'не указано');
+
+    const status =
+      value.status || value.availability || value.available || value.forecast || value.predict ||
+      value.presence || value.hasFuel || value.isAvailable || 'tbank_public_signal';
+
+    const updatedAt =
+      value.updatedAt || value.updateTime || value.lastTransactionAt || value.lastPaymentAt ||
+      value.lastPurchaseAt || value.lastOperationAt || value.lastTransactionDate;
+
+    const quality = addressQuality(address, coords.lat, coords.lon);
+
+    let confidence = 0.40;
+    if (hasAi95(text) || hasAi95(fuel)) confidence += 0.15;
+    if (network) confidence += 0.10;
+    if (quality === 'coordinate') confidence += 0.20;
+    if (quality === 'house') confidence += 0.15;
+    if (quality === 'street_only') confidence += 0.05;
+    confidence = Math.min(confidence, 0.90);
+
     pushObservation(out, {
-      station_name: clean(inferredName || 'АЗС'),
-      address: inferredAddress ? clean(inferredAddress) : null,
-      fuel: fuel ? clean(fuel) : (hasAi95(text) ? 'АИ-95' : 'не указано'),
-      status: status === undefined ? 'tbank_public_signal' : clean(String(status)),
+      station_name: stationName,
+      network: network || stationName,
+      address: address || null,
+      house: address ? findHouse(address) : null,
+      lat: coords.lat || null,
+      lon: coords.lon || null,
+      fuel: clean(fuel),
+      status: clean(String(status)),
       observed_at: updatedAt ? clean(String(updatedAt)) : null,
-      confidence: hasAi95(text) ? 0.65 : 0.45,
+      confidence,
       source: 'tbank_fuel_public',
       source_url: sourceUrl,
       note: 'Публичная карта Т-Банка: сигнал наличия/активности на основе открытой страницы.'
     });
   }
 
-  for (const v of Object.values(value)) {
-    walkJson(v, out, sourceUrl);
-  }
+  for (const v of Object.values(value)) walkJson(v, out, sourceUrl, depth + 1);
 }
 
 async function clickIfVisible(page, selector, timeout = 1500) {
@@ -108,9 +230,7 @@ async function closePopups(page) {
     '[aria-label="Close"]'
   ];
 
-  for (const selector of selectors) {
-    await clickIfVisible(page, selector);
-  }
+  for (const selector of selectors) await clickIfVisible(page, selector);
 }
 
 async function trySearchPerm(page) {
@@ -124,11 +244,11 @@ async function trySearchPerm(page) {
   for (const selector of selectors) {
     try {
       const input = page.locator(selector).first();
-      if (await input.isVisible({ timeout: 2000 })) {
+      if (await input.isVisible({ timeout: 2500 })) {
         await input.click();
         await input.fill('Пермь АИ-95');
         await page.keyboard.press('Enter');
-        await page.waitForTimeout(8000);
+        await page.waitForTimeout(9000);
         return true;
       }
     } catch (e) {}
@@ -139,19 +259,24 @@ async function trySearchPerm(page) {
 
 function extractFromDomText(text) {
   const observations = [];
-  const chunks = clean(text).split(/(?=АЗС|ЛУКОЙЛ|Газпром|Нефтехимпром|Роснефть|Teboil|Татнефть)/i);
+  const chunks = clean(text).split(/(?=АЗС|ЛУКОЙЛ|Лукойл|Газпром|Нефтехимпром|Роснефть|Teboil|Татнефть)/i);
+
   for (const chunk of chunks) {
     if (chunk.length < 30) continue;
     if (!hasAi95(chunk) && !/есть|налич|последн|транзакц|покуп/i.test(chunk)) continue;
 
-    const brand = findBrand(chunk);
+    const network = findBrand(chunk);
     const address = findAddress(chunk);
 
-    if (!brand && !address) continue;
+    if (!network && !address) continue;
 
     pushObservation(observations, {
-      station_name: brand || 'АЗС',
+      station_name: network || 'АЗС',
+      network: network || null,
       address,
+      house: address ? findHouse(address) : null,
+      lat: null,
+      lon: null,
       fuel: hasAi95(chunk) ? 'АИ-95' : 'не указано',
       status: /есть|налич/i.test(chunk) ? 'tbank_public_presence_text' : 'tbank_public_activity_text',
       observed_at: null,
@@ -161,6 +286,7 @@ function extractFromDomText(text) {
       note: 'Извлечено из текста публичной страницы Т-Банка.'
     });
   }
+
   return observations;
 }
 
@@ -185,20 +311,33 @@ async function main() {
   page.on('response', async response => {
     const url = response.url();
     const contentType = response.headers()['content-type'] || '';
-    const interestingUrl = /fuel|gas|station|azs|map|availability|toplivo|points|places|geo/i.test(url);
+    const interestingUrl = /fuel|gas|station|azs|map|availability|toplivo|points|places|geo|poi|merchant/i.test(url);
 
     if (!interestingUrl && !contentType.includes('json')) return;
 
     try {
       if (contentType.includes('json')) {
         const data = await response.json();
+        const before = observations.length;
         walkJson(data, observations, url);
-        networkNotes.push({ url, content_type: contentType, status: response.status(), parsed: true });
+        networkNotes.push({
+          url,
+          content_type: contentType,
+          status: response.status(),
+          parsed: observations.length > before,
+          added: observations.length - before
+        });
       } else {
         networkNotes.push({ url, content_type: contentType, status: response.status(), parsed: false });
       }
     } catch (e) {
-      networkNotes.push({ url, content_type: contentType, status: response.status(), parsed: false, error: String(e.message || e).slice(0, 300) });
+      networkNotes.push({
+        url,
+        content_type: contentType,
+        status: response.status(),
+        parsed: false,
+        error: String(e.message || e).slice(0, 300)
+      });
     }
   });
 
@@ -206,18 +345,16 @@ async function main() {
 
   try {
     await page.goto('https://toplivo.tbank.ru/', { waitUntil: 'domcontentloaded', timeout: 80000 });
-    await page.waitForTimeout(10000);
+    await page.waitForTimeout(12000);
     await closePopups(page);
     await trySearchPerm(page);
-    await page.waitForTimeout(12000);
+    await page.waitForTimeout(15000);
     await closePopups(page);
 
     await page.screenshot({ path: screenshotPath, fullPage: true });
 
     const text = await page.locator('body').innerText({ timeout: 5000 }).catch(() => '');
-    for (const obs of extractFromDomText(text)) {
-      pushObservation(observations, obs);
-    }
+    for (const obs of extractFromDomText(text)) pushObservation(observations, obs);
   } catch (e) {
     pageError = String(e.message || e);
     try {
@@ -236,6 +373,11 @@ async function main() {
 
   fs.writeFileSync(outPath, JSON.stringify(observations, null, 2), 'utf8');
 
+  const preciseCount = observations.filter(x => x.is_precise).length;
+  const coordinateCount = observations.filter(x => x.address_quality === 'coordinate').length;
+  const houseCount = observations.filter(x => x.address_quality === 'house').length;
+  const streetOnlyCount = observations.filter(x => x.address_quality === 'street_only').length;
+
   const status = {
     generated_at: new Date().toISOString(),
     url: 'https://toplivo.tbank.ru/',
@@ -243,11 +385,15 @@ async function main() {
     ok: observations.length > 0,
     status: observations.length > 0 ? 'parsed_public_site' : 'no_public_station_rows',
     observations_count: observations.length,
+    precise_count: preciseCount,
+    coordinate_count: coordinateCount,
+    house_count: houseCount,
+    street_only_count: streetOnlyCount,
     message: observations.length > 0
-      ? `Собрано публичных сигналов Т-Банка: ${observations.length}.`
+      ? `Собрано публичных сигналов Т-Банка: ${observations.length}; точных: ${preciseCount}; с координатами: ${coordinateCount}; с домом: ${houseCount}; только улица: ${streetOnlyCount}.`
       : 'Публичная страница Т-Банка открыта/проверена, но станционные строки не извлечены. Проверьте screenshots/tbank-public.png и network_notes.',
     page_error: pageError,
-    network_notes: networkNotes.slice(0, 80)
+    network_notes: networkNotes.slice(0, 120)
   };
 
   fs.writeFileSync(statusPath, JSON.stringify(status, null, 2), 'utf8');

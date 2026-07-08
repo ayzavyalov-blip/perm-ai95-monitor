@@ -24,9 +24,8 @@
     .pill { display: inline-block; padding: 3px 8px; border-radius: 999px; background: #e2e8f0; margin: 2px 4px 2px 0; font-size: 12px; }
     a { color: #1d4ed8; }
     .button { display: inline-block; padding: 10px 14px; border-radius: 8px; background: #1d4ed8; color: white; text-decoration: none; font-weight: 700; }
-    .button:hover { background: #1e40af; }
-    .top-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
     .secondary-button { display: inline-block; padding: 10px 14px; border-radius: 8px; background: #e2e8f0; color: #0f172a; text-decoration: none; font-weight: 700; }
+    .top-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
     .traffic-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px; margin-top: 12px; }
     .traffic-image { width: 100%; max-height: 760px; object-fit: contain; border: 1px solid #e2e8f0; border-radius: 12px; background: #f8fafc; }
     .image-caption { font-size: 13px; color: #64748b; margin-top: 6px; }
@@ -34,6 +33,7 @@
     .station-button { border: 1px solid #cbd5e1; background: #f8fafc; padding: 8px 10px; border-radius: 8px; cursor: pointer; font-weight: 700; }
     .station-button.active { background: #1d4ed8; color: white; border-color: #1d4ed8; }
     .pipeline { margin: 0; padding-left: 20px; }
+    .warning-box { padding: 10px 12px; border-radius: 10px; background: #fffbeb; border: 1px solid #f59e0b; color: #92400e; margin-top: 8px; }
     @media (max-width: 720px) {
       body { padding: 14px; }
       h1 { font-size: 24px; }
@@ -58,6 +58,7 @@
       <a id="repoLink" class="secondary-button" href="#" target="_blank" rel="noopener">Открыть репозиторий</a>
       <a class="secondary-button" href="data/latest.json" target="_blank" rel="noopener">Открыть latest.json</a>
       <a class="secondary-button" href="data/tbank_public_status.json" target="_blank" rel="noopener">Открыть статус Т-Банка</a>
+      <a class="secondary-button" href="screenshots/tbank-public.png" target="_blank" rel="noopener">Открыть скрин Т-Банка</a>
     </div>
   </div>
 
@@ -68,19 +69,20 @@
     <ol class="pipeline">
       <li><b>gdebenz</b>: смотрим, что пишут люди по АИ-95.</li>
       <li><b>tbank_fuel</b>: сопоставляем с публичной картой Т-Банка на основе транзакционных сигналов.</li>
-      <li><b>карты</b>: строим скриншоты Яндекс/2ГИС только по отобранным АЗС, чтобы видеть подъезды и пробки.</li>
+      <li><b>фильтр точности</b>: сеть + полный адрес с домом или координаты. Адрес только до улицы не проходит.</li>
+      <li><b>карты</b>: строим скриншоты Яндекс/2ГИС по отобранным АЗС, чтобы видеть подъезды и пробки.</li>
     </ol>
   </div>
 
   <div class="card">
     <h2>Рекомендации</h2>
-    <div class="muted">Цена полностью исключена. Рекомендация появляется только при совпадении сигнала gdebenz и tbank_fuel.</div>
+    <div class="muted">Цена исключена. Рекомендация появляется только при совпадении gdebenz и tbank_fuel с достаточной точностью адреса.</div>
     <div id="recommendations"></div>
   </div>
 
   <div class="card">
     <h2>Карта и пробки по отобранным АЗС</h2>
-    <p class="muted">Переключайтесь между АЗС. Скриншоты являются только визуальным слоем: пробка не подтверждает наличие АИ-95.</p>
+    <p class="muted">Переключайтесь между АЗС. Яндекс открывается с параметром <code>l=map,trf</code>, чтобы включить слой пробок.</p>
     <div id="trafficStatus" class="muted">Загрузка статуса скриншотов...</div>
     <div id="stationButtons" class="station-buttons"></div>
     <div id="selectedStationTitle" class="muted"></div>
@@ -110,8 +112,8 @@
       <li>Отметка 20-60 минут: средний сигнал.</li>
       <li>Старше 60 минут: нужен звонок или второй источник.</li>
       <li>Пробка у въезда на АЗС: вспомогательный сигнал очереди, но не доказательство наличия АИ-95.</li>
-      <li>Т-Банк: публичный транзакционный сигнал наличия/активности, но итоговая поездка всё равно требует проверки конкретной АЗС.</li>
-      <li>Автоскриншот карты: визуальная подсказка, а не структурированные данные о наличии топлива.</li>
+      <li>Т-Банк: публичный транзакционный сигнал наличия/активности, но не самостоятельное доказательство наличия конкретного топлива.</li>
+      <li>Адрес только до улицы, например «улица Поляны», не является достаточным для поездки.</li>
     </ul>
   </div>
 </div>
@@ -181,8 +183,8 @@ function renderSummary(data) {
     <div>Время генерации: <b>${esc(formatDate(data.generated_at))}</b></div>
     <div style="margin-top:10px">
       ${candidates.length
-        ? `<span class="status-ok">Есть ${candidates.length} кандидат(ов) после сопоставления gdebenz и tbank_fuel.</span>`
-        : '<span class="status-warn">Нет АЗС, прошедших двойную проверку gdebenz + tbank_fuel.</span>'}
+        ? `<span class="status-ok">Есть ${candidates.length} точный кандидат после сопоставления gdebenz и tbank_fuel.</span>`
+        : '<span class="status-warn">Нет точных АЗС, прошедших фильтр сеть + адрес/координаты.</span>'}
     </div>
     <p class="muted">${esc(data.operator_message || '')}</p>
   `;
@@ -194,11 +196,11 @@ function renderRecommendations(data) {
   if (!rows.length) {
     document.getElementById('recommendations').innerHTML = `
       <p class="status-warn">
-        Конкретных АЗС для поездки нет. Нужны одновременно: сигнал людей на gdebenz и публичный транзакционный сигнал Т-Банка по той же АЗС.
+        Конкретных АЗС для поездки нет. Нужны одновременно: сигнал людей на gdebenz, сигнал Т-Банка и точная привязка к адресу/координатам.
       </p>
-      <p class="muted">
-        Проверьте <code>data/tbank_public_status.json</code> и скрин <code>screenshots/tbank-public.png</code>, если Т-Банк не дал машинные строки.
-      </p>
+      <div class="warning-box">
+        Кандидат уровня «ЛУКОЙЛ / улица Поляны» без дома или координат больше не должен попадать в рекомендации: карта уводит на город или улицу, а не на конкретную АЗС.
+      </div>
     `;
     return;
   }
@@ -208,23 +210,25 @@ function renderRecommendations(data) {
       <table>
         <thead>
           <tr>
-            <th>АЗС</th>
+            <th>Сеть</th>
             <th>Адрес</th>
+            <th>Точность</th>
             <th>Статус</th>
             <th>Доверие</th>
             <th>Совпадение</th>
-            <th>Действие</th>
+            <th>Причина</th>
           </tr>
         </thead>
         <tbody>
           ${rows.map(r => `
             <tr>
-              <td>${esc(r.station_name || 'нет данных')}</td>
+              <td>${esc(r.network || r.station_name || 'нет данных')}</td>
               <td>${esc(r.address || 'нет данных')}</td>
+              <td class="${r.map_ready ? 'status-ok' : 'status-warn'}">${esc(r.address_quality || 'unknown')}</td>
               <td class="${statusClass(r.status || 'unknown')}">${esc(r.status || 'unknown')}</td>
               <td>${Math.round(Number(r.confidence || 0) * 100)}%</td>
               <td>${Math.round(Number(r.match_score || 0) * 100)}%</td>
-              <td>${esc(r.action || '')}</td>
+              <td>${esc((r.match_reasons || []).join('; ') || r.action || '')}</td>
             </tr>
           `).join('')}
         </tbody>
@@ -253,7 +257,6 @@ function selectTrafficTarget(targetId) {
 
   const groups = groupedTrafficResults(trafficState);
   const group = groups.find(g => g.target_id === targetId) || groups[0];
-
   if (!group) return;
 
   selectedTargetId = group.target_id;
@@ -312,7 +315,6 @@ function renderTrafficStatus() {
 
 function renderSources(data) {
   const rows = data.source_results || [];
-
   if (!rows.length) {
     document.getElementById('sources').innerHTML = '<p class="status-warn">Источники не загружены.</p>';
     return;
