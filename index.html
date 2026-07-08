@@ -57,8 +57,10 @@
       <a id="runWorkflowLink" class="button" href="#" target="_blank" rel="noopener">Открыть запуск GitHub Actions</a>
       <a id="repoLink" class="secondary-button" href="#" target="_blank" rel="noopener">Открыть репозиторий</a>
       <a class="secondary-button" href="data/latest.json" target="_blank" rel="noopener">Открыть latest.json</a>
-      <a class="secondary-button" href="data/tbank_public_status.json" target="_blank" rel="noopener">Открыть статус Т-Банка</a>
-      <a class="secondary-button" href="screenshots/tbank-public.png" target="_blank" rel="noopener">Открыть скрин Т-Банка</a>
+      <a class="secondary-button" href="data/gdebenz_public_status.json" target="_blank" rel="noopener">Статус ГдеБЕНЗ</a>
+      <a class="secondary-button" href="screenshots/gdebenz-public.png" target="_blank" rel="noopener">Скрин ГдеБЕНЗ</a>
+      <a class="secondary-button" href="data/tbank_public_status.json" target="_blank" rel="noopener">Статус Т-Банка</a>
+      <a class="secondary-button" href="screenshots/tbank-public.png" target="_blank" rel="noopener">Скрин Т-Банка</a>
     </div>
   </div>
 
@@ -67,10 +69,10 @@
   <div class="card">
     <h2>Логика отбора</h2>
     <ol class="pipeline">
-      <li><b>gdebenz</b>: смотрим, что пишут люди по АИ-95.</li>
-      <li><b>tbank_fuel</b>: сопоставляем с публичной картой Т-Банка на основе транзакционных сигналов.</li>
+      <li><b>gdebenz UI</b>: город Пермь, фильтры «Где есть топливо», «95», «Все», «Готово».</li>
+      <li><b>tbank_fuel</b>: публичная карта Т-Банка на основе транзакционных сигналов.</li>
       <li><b>фильтр точности</b>: сеть + полный адрес с домом или координаты. Адрес только до улицы не проходит.</li>
-      <li><b>карты</b>: строим скриншоты Яндекс/2ГИС по отобранным АЗС, чтобы видеть подъезды и пробки.</li>
+      <li><b>карты</b>: скриншоты Яндекс/2ГИС по отобранным АЗС.</li>
     </ol>
   </div>
 
@@ -82,7 +84,7 @@
 
   <div class="card">
     <h2>Карта и пробки по отобранным АЗС</h2>
-    <p class="muted">Переключайтесь между АЗС. Яндекс открывается с параметром <code>l=map,trf</code>, чтобы включить слой пробок.</p>
+    <p class="muted">Переключайтесь между АЗС. Яндекс открывается с <code>ll=Пермь</code> и <code>l=map,trf</code>.</p>
     <div id="trafficStatus" class="muted">Загрузка статуса скриншотов...</div>
     <div id="stationButtons" class="station-buttons"></div>
     <div id="selectedStationTitle" class="muted"></div>
@@ -162,8 +164,8 @@ function shortText(s, maxLen = 360) {
 }
 
 function statusClass(status) {
-  if (['parsed_partial', 'parsed_public_site', 'screenshot_saved', 'map_after_selection'].includes(status)) return 'status-ok';
-  if (['map_dynamic_no_station_rows', 'manual_or_app_required', 'unknown', 'no_public_station_rows'].includes(status)) return 'status-warn';
+  if (['parsed_public_ui', 'parsed_partial', 'parsed_public_site', 'screenshot_saved', 'map_after_selection'].includes(status)) return 'status-ok';
+  if (['static_general_only', 'map_dynamic_no_station_rows', 'manual_or_app_required', 'unknown', 'no_public_station_rows', 'no_station_rows_from_ui'].includes(status)) return 'status-warn';
   return 'status-bad';
 }
 
@@ -199,7 +201,7 @@ function renderRecommendations(data) {
         Конкретных АЗС для поездки нет. Нужны одновременно: сигнал людей на gdebenz, сигнал Т-Банка и точная привязка к адресу/координатам.
       </p>
       <div class="warning-box">
-        Кандидат уровня «ЛУКОЙЛ / улица Поляны» без дома или координат больше не должен попадать в рекомендации: карта уводит на город или улицу, а не на конкретную АЗС.
+        Проверьте <code>screenshots/gdebenz-public.png</code> и <code>data/gdebenz_observations.json</code>: если UI собрал карточки только без домов, они не будут рекомендованы.
       </div>
     `;
     return;
@@ -213,7 +215,7 @@ function renderRecommendations(data) {
             <th>Сеть</th>
             <th>Адрес</th>
             <th>Точность</th>
-            <th>Статус</th>
+            <th>Очередь</th>
             <th>Доверие</th>
             <th>Совпадение</th>
             <th>Причина</th>
@@ -225,7 +227,7 @@ function renderRecommendations(data) {
               <td>${esc(r.network || r.station_name || 'нет данных')}</td>
               <td>${esc(r.address || 'нет данных')}</td>
               <td class="${r.map_ready ? 'status-ok' : 'status-warn'}">${esc(r.address_quality || 'unknown')}</td>
-              <td class="${statusClass(r.status || 'unknown')}">${esc(r.status || 'unknown')}</td>
+              <td>${esc((r.gdebenz_signal && r.gdebenz_signal.queue) || 'нет данных')}</td>
               <td>${Math.round(Number(r.confidence || 0) * 100)}%</td>
               <td>${Math.round(Number(r.match_score || 0) * 100)}%</td>
               <td>${esc((r.match_reasons || []).join('; ') || r.action || '')}</td>

@@ -58,7 +58,8 @@ function yandexUrl(target) {
     const lat = encodeURIComponent(target.lat);
     return `https://yandex.ru/maps/50/perm/?ll=${lon}%2C${lat}&z=17&l=map%2Ctrf&pt=${lon},${lat},pm2rdm&text=${text}`;
   }
-  return `https://yandex.ru/maps/50/perm/search/${text}/?l=map%2Ctrf&z=16`;
+  // Обязательно указываем ll Перми, иначе Яндекс иногда открывает воду/пустой центр.
+  return `https://yandex.ru/maps/50/perm/search/${text}/?ll=56.2502%2C58.0105&z=13&l=map%2Ctrf`;
 }
 
 function gisUrl(target) {
@@ -66,7 +67,7 @@ function gisUrl(target) {
   if (hasCoords(target)) {
     return `https://2gis.ru/perm/search/${text}?m=${target.lon}%2C${target.lat}%2F17&traffic`;
   }
-  return `https://2gis.ru/perm/search/${text}?traffic`;
+  return `https://2gis.ru/perm/search/${text}?m=56.2502%2C58.0105%2F12&traffic`;
 }
 
 function writeStatus(payload) {
@@ -98,10 +99,22 @@ async function closeYandexPopups(page) {
   ];
 
   for (const selector of selectors) await clickIfVisible(page, selector);
+
+  await page.evaluate(() => {
+    const kill = ['Yandex uses cookies', 'Allow all', 'Allow essential cookies'];
+    for (const el of Array.from(document.querySelectorAll('div, section, aside'))) {
+      const text = (el.innerText || '').trim();
+      if (kill.some(k => text.includes(k))) {
+        const rect = el.getBoundingClientRect();
+        if (rect.width > 250 && rect.height > 60) {
+          el.style.display = 'none';
+        }
+      }
+    }
+  }).catch(() => {});
 }
 
 async function tryEnableYandexTraffic(page) {
-  // Основной способ - URL l=map,trf. Здесь резерв: пробуем нажать кнопку/слой "Пробки".
   const selectors = [
     '[aria-label*="Пробки"]',
     'button[aria-label*="Пробки"]',
@@ -211,7 +224,7 @@ async function capture(browser, source, target, url, screenshotPath) {
       started_at: startedAt,
       finished_at: new Date().toISOString(),
       message: source === 'yandex_maps_traffic'
-        ? 'Скриншот сохранён. Яндекс открыт с параметром l=map,trf для слоя пробок.'
+        ? 'Скриншот сохранён. Яндекс открыт с ll=Пермь и l=map,trf для слоя пробок.'
         : 'Скриншот сохранён. Это визуальный слой пробок, не подтверждение наличия АИ-95.'
     };
   } catch (e) {

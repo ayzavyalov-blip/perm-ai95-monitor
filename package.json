@@ -1,5 +1,6 @@
 {
   "scripts": {
+    "gdebenz:collect": "node scripts/collect-gdebenz-public.js",
     "tbank:collect": "node scripts/collect-tbank-public.js",
     "traffic:screenshots": "node scripts/make-traffic-screenshots.js"
   },

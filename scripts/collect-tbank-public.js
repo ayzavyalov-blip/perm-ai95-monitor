@@ -26,7 +26,7 @@ function hasAi95(text) {
 }
 
 function findAddress(text) {
-  const m = String(text || '').match(/((ул\.|улица|шоссе|проспект|пр-т|тракт|дорога|бульвар|переулок|посёлок|поселок|микрорайон)[^,;"']{3,140})/i);
+  const m = String(text || '').match(/((ул\.|улица|шоссе|проспект|пр-т|тракт|дорога|бульвар|переулок|посёлок|поселок|микрорайон|км|километр)[^,;"']{3,160})/i);
   return m ? clean(m[1]) : null;
 }
 
@@ -40,10 +40,11 @@ function hasHouseNumber(address) {
 }
 
 function findBrand(text) {
-  const m = String(text || '').match(/(ЛУКОЙЛ|Лукойл|Газпромнефть|Газпром|Нефтехимпром|Экойл|Ликом|Teboil|Роснефть|Get Petrol|Башнефть|Татнефть)/i);
+  const m = String(text || '').match(/(ЛУКОЙЛ|Лукойл|Газпромнефть|Газпром|Нефтехимпром|Экойл|Ликом|Teboil|Роснефть|Get Petrol|Башнефть|Татнефть|V&V|V\s*&\s*V)/i);
   if (!m) return null;
   const value = clean(m[1]);
   if (/лукойл/i.test(value)) return 'ЛУКОЙЛ';
+  if (/v\s*&\s*v/i.test(value)) return 'V&V';
   return value;
 }
 
@@ -105,8 +106,6 @@ function addressQuality(address, lat, lon) {
 
 function pushObservation(list, item) {
   const quality = addressQuality(item.address, item.lat, item.lon);
-
-  // Отбрасываем совсем пустые строки.
   if (!item.station_name && !item.address && !item.lat) return;
 
   const key = [
@@ -132,14 +131,12 @@ function pushObservation(list, item) {
 
 function looksLikeStationObject(value) {
   if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
-  const text = normalize(JSON.stringify(value).slice(0, 6000));
-  return (
-    /азс|fuel|gas|station|топлив|бензин|аи[-\s]?95|лукойл|газпром|роснефть|нефтехимпром/.test(text)
-  );
+  const text = normalize(JSON.stringify(value).slice(0, 7000));
+  return /азс|fuel|gas|station|топлив|бензин|аи[-\s]?95|лукойл|газпром|роснефть|нефтехимпром|teboil|v&v/.test(text);
 }
 
 function walkJson(value, out, sourceUrl, depth = 0) {
-  if (!value || out.length >= 120 || depth > 12) return;
+  if (!value || out.length >= 150 || depth > 12) return;
 
   if (Array.isArray(value)) {
     for (const item of value) walkJson(item, out, sourceUrl, depth + 1);
@@ -149,7 +146,7 @@ function walkJson(value, out, sourceUrl, depth = 0) {
   if (typeof value !== 'object') return;
 
   if (looksLikeStationObject(value)) {
-    const text = clean(JSON.stringify(value).slice(0, 7000));
+    const text = clean(JSON.stringify(value).slice(0, 8000));
     const coords = extractLatLon(value) || {};
 
     const rawName =
@@ -259,7 +256,7 @@ async function trySearchPerm(page) {
 
 function extractFromDomText(text) {
   const observations = [];
-  const chunks = clean(text).split(/(?=АЗС|ЛУКОЙЛ|Лукойл|Газпром|Нефтехимпром|Роснефть|Teboil|Татнефть)/i);
+  const chunks = clean(text).split(/(?=АЗС|ЛУКОЙЛ|Лукойл|Газпром|Нефтехимпром|Роснефть|Teboil|Татнефть|V&V)/i);
 
   for (const chunk of chunks) {
     if (chunk.length < 30) continue;
@@ -390,8 +387,8 @@ async function main() {
     house_count: houseCount,
     street_only_count: streetOnlyCount,
     message: observations.length > 0
-      ? `Собрано публичных сигналов Т-Банка: ${observations.length}; точных: ${preciseCount}; с координатами: ${coordinateCount}; с домом: ${houseCount}; только улица: ${streetOnlyCount}.`
-      : 'Публичная страница Т-Банка открыта/проверена, но станционные строки не извлечены. Проверьте screenshots/tbank-public.png и network_notes.',
+      ? `Т-Банк: собрано ${observations.length}; точных: ${preciseCount}; с координатами: ${coordinateCount}; с домом: ${houseCount}; только улица: ${streetOnlyCount}.`
+      : 'Публичная страница Т-Банка открыта/проверена, но станционные строки не извлечены.',
     page_error: pageError,
     network_notes: networkNotes.slice(0, 120)
   };

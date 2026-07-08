@@ -11,7 +11,7 @@ permissions:
 jobs:
   update:
     runs-on: ubuntu-latest
-    timeout-minutes: 35
+    timeout-minutes: 45
 
     steps:
       - name: Checkout
@@ -27,7 +27,7 @@ jobs:
           getent hosts 2gis.ru || true
 
           echo "=== HTTP diagnostics ==="
-          curl -I -L --max-time 20 https://gdebenz.ru/perm || true
+          curl -I -L --max-time 20 https://gdebenz.ru/ || true
           curl -I -L --max-time 20 https://toplivo.tbank.ru/ || true
           curl -I -L --max-time 20 "https://yandex.ru/maps/50/perm/?l=map%2Ctrf" || true
           curl -I -L --max-time 20 "https://2gis.ru/perm?traffic" || true
@@ -49,7 +49,7 @@ jobs:
           echo "Using gdebenz.ru IP: $GDEBENZ_IP"
           echo "$GDEBENZ_IP gdebenz.ru www.gdebenz.ru" | sudo tee -a /etc/hosts
           getent hosts gdebenz.ru || true
-          curl -I -L --max-time 20 https://gdebenz.ru/perm || true
+          curl -I -L --max-time 20 https://gdebenz.ru/ || true
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -60,6 +60,11 @@ jobs:
         run: |
           npm install --no-audit --no-fund
           npx playwright install --with-deps chromium
+
+      - name: Collect gdebenz public UI signals
+        run: |
+          mkdir -p data screenshots
+          node scripts/collect-gdebenz-public.js
 
       - name: Collect TBank public fuel signals
         run: |
@@ -89,6 +94,6 @@ jobs:
         run: |
           git config user.name "ai95-monitor-bot"
           git config user.email "ai95-monitor-bot@users.noreply.github.com"
-          git add data/latest.json data/history/ data/tbank_observations.json data/tbank_public_status.json screenshots/
-          git diff --cached --quiet && echo "No data changes" || git commit -m "Update AI-95 precise candidates and traffic screenshots"
+          git add data/latest.json data/history/ data/gdebenz_observations.json data/gdebenz_public_status.json data/tbank_observations.json data/tbank_public_status.json screenshots/
+          git diff --cached --quiet && echo "No data changes" || git commit -m "Update AI-95 monitor from gdebenz UI and TBank"
           git push
