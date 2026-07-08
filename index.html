@@ -10,22 +10,31 @@
       color: #1f2937;
       background: #f8fafc;
     }
+
     body {
       margin: 0;
       padding: 24px;
     }
+
     .container {
       max-width: 1180px;
       margin: 0 auto;
     }
+
     h1 {
       margin: 0 0 8px;
       font-size: 28px;
     }
+
+    h2 {
+      margin-top: 0;
+    }
+
     .muted {
       color: #64748b;
       font-size: 14px;
     }
+
     .card {
       background: white;
       border: 1px solid #e2e8f0;
@@ -34,47 +43,57 @@
       margin: 16px 0;
       box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
     }
+
     .status-ok {
       color: #166534;
       font-weight: 700;
     }
+
     .status-warn {
       color: #92400e;
       font-weight: 700;
     }
+
     .status-bad {
       color: #991b1b;
       font-weight: 700;
     }
+
     table {
       width: 100%;
       border-collapse: collapse;
       background: white;
       font-size: 14px;
     }
+
     th, td {
       border-bottom: 1px solid #e2e8f0;
       padding: 10px;
       text-align: left;
       vertical-align: top;
     }
+
     th {
       background: #f1f5f9;
       font-weight: 700;
     }
+
     code {
       background: #f1f5f9;
       padding: 2px 5px;
       border-radius: 5px;
     }
+
     .grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
       gap: 12px;
     }
+
     .small {
       font-size: 13px;
     }
+
     .pill {
       display: inline-block;
       padding: 3px 8px;
@@ -83,15 +102,104 @@
       margin: 2px 4px 2px 0;
       font-size: 12px;
     }
+
     a {
       color: #1d4ed8;
     }
+
+    .button {
+      display: inline-block;
+      padding: 10px 14px;
+      border-radius: 8px;
+      background: #1d4ed8;
+      color: white;
+      text-decoration: none;
+      font-weight: 700;
+    }
+
+    .button:hover {
+      background: #1e40af;
+    }
+
+    .top-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .secondary-button {
+      display: inline-block;
+      padding: 10px 14px;
+      border-radius: 8px;
+      background: #e2e8f0;
+      color: #0f172a;
+      text-decoration: none;
+      font-weight: 700;
+    }
+
+    .secondary-button:hover {
+      background: #cbd5e1;
+    }
+
+    .nowrap {
+      white-space: nowrap;
+    }
+
+    @media (max-width: 720px) {
+      body {
+        padding: 14px;
+      }
+
+      h1 {
+        font-size: 24px;
+      }
+
+      table {
+        font-size: 12px;
+      }
+
+      th, td {
+        padding: 8px;
+      }
+
+      .card {
+        padding: 14px;
+      }
+
+      .table-wrap {
+        overflow-x: auto;
+      }
+    }
   </style>
 </head>
+
 <body>
 <div class="container">
   <h1>АИ-95 Пермь: мониторинг</h1>
   <div class="muted">Статическая витрина GitHub Pages. Данные обновляются через GitHub Actions.</div>
+
+  <div class="card">
+    <h2>Ручной запуск</h2>
+    <p>
+      Автоматический сбор выполняется через GitHub Actions. Для ручного запуска откройте workflow и нажмите
+      <b>Run workflow</b>.
+    </p>
+    <div class="top-actions">
+      <a id="runWorkflowLink" class="button" href="#" target="_blank" rel="noopener">
+        Открыть запуск GitHub Actions
+      </a>
+      <a id="repoLink" class="secondary-button" href="#" target="_blank" rel="noopener">
+        Открыть репозиторий
+      </a>
+      <a id="latestJsonLink" class="secondary-button" href="data/latest.json" target="_blank" rel="noopener">
+        Открыть latest.json
+      </a>
+    </div>
+    <p class="muted">
+      Прямой запуск без перехода на GitHub не включён: для него нужен GitHub token, а токен нельзя хранить в статической странице.
+    </p>
+  </div>
 
   <div id="summary" class="card">Загрузка данных...</div>
 
@@ -119,6 +227,37 @@
 </div>
 
 <script>
+function getRepoInfoFromPageUrl() {
+  const host = window.location.hostname;
+  const pathParts = window.location.pathname.split('/').filter(Boolean);
+
+  let owner = 'azyavyalov-blip';
+  let repo = 'perm-ai95-monitor';
+
+  if (host.endsWith('.github.io')) {
+    owner = host.replace('.github.io', '');
+    if (pathParts.length > 0) {
+      repo = pathParts[0];
+    }
+  }
+
+  return { owner, repo };
+}
+
+function setupLinks() {
+  const { owner, repo } = getRepoInfoFromPageUrl();
+  const workflowFile = 'update.yml';
+
+  const workflowUrl = `https://github.com/${owner}/${repo}/actions/workflows/${workflowFile}`;
+  const repoUrl = `https://github.com/${owner}/${repo}`;
+
+  const workflowLink = document.getElementById('runWorkflowLink');
+  const repoLink = document.getElementById('repoLink');
+
+  if (workflowLink) workflowLink.href = workflowUrl;
+  if (repoLink) repoLink.href = repoUrl;
+}
+
 async function loadData() {
   const res = await fetch('data/latest.json?ts=' + Date.now());
   if (!res.ok) throw new Error('Не удалось загрузить data/latest.json');
@@ -127,20 +266,46 @@ async function loadData() {
 
 function esc(s) {
   return String(s ?? '').replace(/[&<>"']/g, ch => ({
-    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;'
   }[ch]));
 }
 
 function statusClass(status) {
   if (['parsed_partial'].includes(status)) return 'status-ok';
-  if (['map_dynamic_no_station_rows', 'no_station_rows', 'manual_or_app_required'].includes(status)) return 'status-warn';
+
+  if ([
+    'map_dynamic_no_station_rows',
+    'no_station_rows',
+    'manual_or_app_required',
+    'unknown'
+  ].includes(status)) {
+    return 'status-warn';
+  }
+
   return 'status-bad';
 }
 
+function formatDate(value) {
+  if (!value) return 'нет данных';
+
+  const d = new Date(value);
+  if (Number.isNaN(d.getTime())) return value;
+
+  return d.toLocaleString('ru-RU');
+}
+
+function hasHardRecommendation(data) {
+  const rows = data.recommendations || [];
+  return rows.some(r => Number(r.confidence || 0) >= 0.6 && r.status !== 'unknown');
+}
+
 function renderSummary(data) {
-  const gen = new Date(data.generated_at).toLocaleString('ru-RU');
-  const recCount = (data.recommendations || []).length;
-  const hardRecommendation = recCount > 0 && (data.recommendations || []).some(r => Number(r.confidence || 0) >= 0.6);
+  const gen = formatDate(data.generated_at);
+  const hardRecommendation = hasHardRecommendation(data);
 
   document.getElementById('summary').innerHTML = `
     <h2>Последняя проверка</h2>
@@ -159,72 +324,94 @@ function renderSummary(data) {
 
 function renderRecommendations(data) {
   const rows = data.recommendations || [];
+
   if (!rows.length) {
     document.getElementById('recommendations').innerHTML = `
-      <p class="status-warn">Конкретных АЗС для поездки нет. Источники не отдали свежие станционные данные в пригодном формате.</p>
+      <p class="status-warn">
+        Конкретных АЗС для поездки нет. Источники не отдали свежие станционные данные в пригодном формате.
+      </p>
     `;
     return;
   }
 
   document.getElementById('recommendations').innerHTML = `
-    <table>
-      <thead>
-        <tr>
-          <th>АЗС</th>
-          <th>Адрес</th>
-          <th>Статус</th>
-          <th>Цена</th>
-          <th>Доверие</th>
-          <th>Источники</th>
-          <th>Действие</th>
-        </tr>
-      </thead>
-      <tbody>
-        ${rows.map(r => `
+    <div class="table-wrap">
+      <table>
+        <thead>
           <tr>
-            <td>${esc(r.station_name)}</td>
-            <td>${esc(r.address || 'нет данных')}</td>
-            <td>${esc(r.status || 'unknown')}</td>
-            <td>${r.price_rub ? esc(r.price_rub) + ' руб.' : 'нет данных'}</td>
-            <td>${Math.round(Number(r.confidence || 0) * 100)}%</td>
-            <td>${(r.sources || []).map(s => `<span class="pill">${esc(s)}</span>`).join('')}</td>
-            <td>${esc(r.action || '')}</td>
+            <th>АЗС</th>
+            <th>Адрес</th>
+            <th>Статус</th>
+            <th>Цена</th>
+            <th>Доверие</th>
+            <th>Источники</th>
+            <th>Действие</th>
           </tr>
-        `).join('')}
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          ${rows.map(r => `
+            <tr>
+              <td>${esc(r.station_name || 'нет данных')}</td>
+              <td>${esc(r.address || 'нет данных')}</td>
+              <td class="${statusClass(r.status || 'unknown')}">${esc(r.status || 'unknown')}</td>
+              <td class="nowrap">${r.price_rub ? esc(r.price_rub) + ' руб.' : 'нет данных'}</td>
+              <td class="nowrap">${Math.round(Number(r.confidence || 0) * 100)}%</td>
+              <td>${(r.sources || []).map(s => `<span class="pill">${esc(s)}</span>`).join('')}</td>
+              <td>${esc(r.action || '')}</td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>
+    <p class="muted">
+      Если статус unknown или доверие ниже 60%, это не является рекомендацией ехать на АЗС.
+    </p>
   `;
 }
 
 function renderSources(data) {
   const rows = data.source_results || [];
+
+  if (!rows.length) {
+    document.getElementById('sources').innerHTML = `
+      <p class="status-warn">
+        Источники не загружены. Вероятно, открыт демо-файл или workflow ещё не записал обновлённый data/latest.json.
+      </p>
+    `;
+    return;
+  }
+
   document.getElementById('sources').innerHTML = `
-    <table>
-      <thead>
-        <tr>
-          <th>Источник</th>
-          <th>Роль</th>
-          <th>Статус</th>
-          <th>HTTP</th>
-          <th>Сообщение</th>
-          <th>Ссылка</th>
-        </tr>
-      </thead>
-      <tbody>
-        ${rows.map(s => `
+    <div class="table-wrap">
+      <table>
+        <thead>
           <tr>
-            <td><b>${esc(s.source)}</b></td>
-            <td>${esc(s.role)}</td>
-            <td class="${statusClass(s.status)}">${esc(s.status)}</td>
-            <td>${esc(s.http_status || '')}</td>
-            <td class="small">${esc(s.message)}</td>
-            <td><a href="${esc(s.url)}" target="_blank" rel="noopener">открыть</a></td>
+            <th>Источник</th>
+            <th>Роль</th>
+            <th>Статус</th>
+            <th>HTTP</th>
+            <th>Сообщение</th>
+            <th>Ссылка</th>
           </tr>
-        `).join('')}
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          ${rows.map(s => `
+            <tr>
+              <td><b>${esc(s.source)}</b></td>
+              <td>${esc(s.role)}</td>
+              <td class="${statusClass(s.status)}">${esc(s.status)}</td>
+              <td>${esc(s.http_status || '')}</td>
+              <td class="small">${esc(s.message)}</td>
+              <td><a href="${esc(s.url)}" target="_blank" rel="noopener">открыть</a></td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>
   `;
 }
+
+setupLinks();
 
 loadData()
   .then(data => {
@@ -234,6 +421,11 @@ loadData()
   })
   .catch(err => {
     document.getElementById('summary').innerHTML = `<span class="status-bad">${esc(err.message)}</span>`;
+    document.getElementById('recommendations').innerHTML = `
+      <p class="status-warn">
+        Проверьте, что файл <code>data/latest.json</code> есть в репозитории и доступен через GitHub Pages.
+      </p>
+    `;
   });
 </script>
 </body>
