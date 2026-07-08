@@ -16,9 +16,14 @@
     .status-ok { color: #166534; font-weight: 700; }
     .status-warn { color: #92400e; font-weight: 700; }
     .status-bad { color: #991b1b; font-weight: 700; }
-    table { width: 100%; border-collapse: collapse; background: white; font-size: 14px; }
-    th, td { border-bottom: 1px solid #e2e8f0; padding: 10px; text-align: left; vertical-align: top; }
+    table { width: 100%; border-collapse: collapse; background: white; font-size: 14px; table-layout: fixed; }
+    th, td { border-bottom: 1px solid #e2e8f0; padding: 10px; text-align: left; vertical-align: top; overflow-wrap: anywhere; }
     th { background: #f1f5f9; font-weight: 700; }
+    th:nth-child(1), td:nth-child(1) { width: 130px; }
+    th:nth-child(2), td:nth-child(2) { width: 130px; }
+    th:nth-child(3), td:nth-child(3) { width: 160px; }
+    th:nth-child(4), td:nth-child(4) { width: 70px; }
+    th:nth-child(6), td:nth-child(6) { width: 80px; }
     code { background: #f1f5f9; padding: 2px 5px; border-radius: 5px; }
     .small { font-size: 13px; }
     .pill { display: inline-block; padding: 3px 8px; border-radius: 999px; background: #e2e8f0; margin: 2px 4px 2px 0; font-size: 12px; }
@@ -107,7 +112,7 @@
 function getRepoInfoFromPageUrl() {
   const host = window.location.hostname;
   const pathParts = window.location.pathname.split('/').filter(Boolean);
-  let owner = 'azyavyalov-blip';
+  let owner = 'ayzavyalov-blip';
   let repo = 'perm-ai95-monitor';
 
   if (host.endsWith('.github.io')) {
@@ -120,11 +125,8 @@ function getRepoInfoFromPageUrl() {
 
 function setupLinks() {
   const { owner, repo } = getRepoInfoFromPageUrl();
-  const workflowUrl = `https://github.com/${owner}/${repo}/actions/workflows/update.yml`;
-  const repoUrl = `https://github.com/${owner}/${repo}`;
-
-  document.getElementById('runWorkflowLink').href = workflowUrl;
-  document.getElementById('repoLink').href = repoUrl;
+  document.getElementById('runWorkflowLink').href = `https://github.com/${owner}/${repo}/actions/workflows/update.yml`;
+  document.getElementById('repoLink').href = `https://github.com/${owner}/${repo}`;
 }
 
 async function loadData() {
@@ -141,6 +143,12 @@ async function loadTrafficStatus() {
 
 function esc(s) {
   return String(s ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+}
+
+function shortText(s, maxLen = 360) {
+  const text = String(s ?? '');
+  if (text.length <= maxLen) return text;
+  return text.slice(0, maxLen) + '...';
 }
 
 function statusClass(status) {
@@ -238,16 +246,20 @@ function renderSources(data) {
           </tr>
         </thead>
         <tbody>
-          ${rows.map(s => `
-            <tr>
-              <td><b>${esc(s.source)}</b></td>
-              <td>${esc(s.role)}</td>
-              <td class="${statusClass(s.status)}">${esc(s.status)}</td>
-              <td>${esc(s.http_status || '')}</td>
-              <td class="small">${esc(s.message)}</td>
-              <td><a href="${esc(s.url)}" target="_blank" rel="noopener">открыть</a></td>
-            </tr>
-          `).join('')}
+          ${rows.map(s => {
+            const fullMessage = s.message || '';
+            const shownMessage = shortText(fullMessage);
+            return `
+              <tr>
+                <td><b>${esc(s.source)}</b></td>
+                <td>${esc(s.role)}</td>
+                <td class="${statusClass(s.status)}">${esc(s.status)}</td>
+                <td>${esc(s.http_status || '')}</td>
+                <td class="small" title="${esc(fullMessage)}">${esc(shownMessage)}</td>
+                <td><a href="${esc(s.url)}" target="_blank" rel="noopener">открыть</a></td>
+              </tr>
+            `;
+          }).join('')}
         </tbody>
       </table>
     </div>

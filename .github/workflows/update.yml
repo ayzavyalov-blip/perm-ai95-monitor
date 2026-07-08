@@ -53,12 +53,13 @@ jobs:
             GDEBENZ_IP="$(dig +short A gdebenz.ru @8.8.8.8 | grep -E '^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$' | head -n1)"
           fi
 
-          if [ -n "$GDEBENZ_IP" ]; then
-            echo "Found gdebenz.ru IP: $GDEBENZ_IP"
-            echo "$GDEBENZ_IP gdebenz.ru www.gdebenz.ru" | sudo tee -a /etc/hosts
-          else
-            echo "Could not resolve gdebenz.ru through public resolvers."
+          if [ -z "$GDEBENZ_IP" ]; then
+            echo "Public resolvers did not return an IP. Using temporary fallback IP 80.87.196.21."
+            GDEBENZ_IP="80.87.196.21"
           fi
+
+          echo "Using gdebenz.ru IP: $GDEBENZ_IP"
+          echo "$GDEBENZ_IP gdebenz.ru www.gdebenz.ru" | sudo tee -a /etc/hosts
 
           echo "=== hosts after DNS fix ==="
           getent hosts gdebenz.ru || true
@@ -67,6 +68,7 @@ jobs:
           echo "=== HTTP after DNS fix ==="
           curl -I -L --max-time 20 https://gdebenz.ru/perm || true
           curl -I -L --max-time 20 https://gdebenz.ru/fuel/ai-95 || true
+          curl -I -L --max-time 20 https://gdebenz.ru/ || true
 
       - name: Set up Python
         uses: actions/setup-python@v5
