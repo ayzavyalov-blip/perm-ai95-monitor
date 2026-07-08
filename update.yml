@@ -11,11 +11,30 @@ permissions:
 jobs:
   update:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Network diagnostics
+        continue-on-error: true
+        run: |
+          echo "=== resolv.conf ==="
+          cat /etc/resolv.conf || true
+
+          echo "=== DNS diagnostics ==="
+          getent hosts gdebenz.ru || true
+          getent hosts www.gdebenz.ru || true
+          getent hosts russiabase.ru || true
+          getent hosts fuelprice.ru || true
+          getent hosts multigo.ru || true
+
+          echo "=== HTTP diagnostics ==="
+          curl -I -L --max-time 20 https://gdebenz.ru/ || true
+          curl -I -L --max-time 20 https://www.gdebenz.ru/ || true
+          curl -I -L --max-time 20 "https://russiabase.ru/prices?city=154336&mark=ai95" || true
+          curl -I -L --max-time 20 https://fuelprice.ru/perm || true
 
       - name: Set up Python
         uses: actions/setup-python@v5
