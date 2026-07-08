@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-08T13:20:26.593Z",
+  "generated_at": "2026-07-08T13:31:26.874Z",
   "mode": "station_specific_precise",
   "note": "Скриншоты пробок являются вспомогательным визуальным слоем и не подтверждают наличие АИ-95.",
   "targets": [
@@ -22,13 +22,13 @@
       "target_id": "perm-general",
       "target_label": "Пермь: общий обзор АЗС АИ-95",
       "query": "АЗС АИ-95 Пермь",
-      "url": "https://yandex.ru/maps/50/perm/?ll=0%2C0&z=17&l=map%2Ctrf&pt=0,0,pm2rdm&text=%D0%90%D0%97%D0%A1%20%D0%90%D0%98-95%20%D0%9F%D0%B5%D1%80%D0%BC%D1%8C",
+      "url": "https://yandex.ru/maps/50/perm/probki/?ll=56.2342%2C58.0105&z=11",
       "ok": true,
       "status": "screenshot_saved",
       "screenshot_path": "screenshots/stations/perm-general-yandex.png",
-      "started_at": "2026-07-08T13:19:19.081Z",
-      "finished_at": "2026-07-08T13:19:49.694Z",
-      "message": "Скриншот сохранён. Яндекс открыт с ll=Пермь и l=map,trf для слоя пробок."
+      "started_at": "2026-07-08T13:30:28.311Z",
+      "finished_at": "2026-07-08T13:30:51.585Z",
+      "message": "Скриншот сохранён. Для общего обзора использован /probki с центром Перми."
     },
     {
       "source": "2gis_traffic",
@@ -39,8 +39,8 @@
       "ok": true,
       "status": "screenshot_saved",
       "screenshot_path": "screenshots/stations/perm-general-2gis.png",
-      "started_at": "2026-07-08T13:19:49.694Z",
-      "finished_at": "2026-07-08T13:20:26.561Z",
+      "started_at": "2026-07-08T13:30:51.585Z",
+      "finished_at": "2026-07-08T13:31:26.844Z",
       "message": "Скриншот сохранён. Это визуальный слой пробок, не подтверждение наличия АИ-95."
     }
   ]
