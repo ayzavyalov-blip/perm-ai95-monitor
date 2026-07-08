@@ -1,45 +1,46 @@
 {
-  "generated_at": "2026-07-08T12:39:17.696Z",
-  "mode": "station_specific",
+  "generated_at": "2026-07-08T12:53:31.636Z",
+  "mode": "station_specific_precise",
   "note": "Скриншоты пробок являются вспомогательным визуальным слоем и не подтверждают наличие АИ-95.",
   "targets": [
     {
-      "station_id": "68823159658ea3e4",
-      "label": "Лукойл / улица Поляны",
-      "query": "Лукойл улица Поляны Пермь АЗС",
-      "confidence": 0.67,
-      "sources": [
-        "gdebenz",
-        "tbank_fuel"
-      ],
-      "is_fallback": false
+      "station_id": "perm-general",
+      "label": "Пермь: общий обзор АЗС АИ-95",
+      "query": "АЗС АИ-95 Пермь",
+      "lat": 0,
+      "lon": 0,
+      "address_quality": "diagnostic",
+      "map_ready": false,
+      "confidence": null,
+      "sources": [],
+      "is_fallback": true
     }
   ],
   "results": [
     {
       "source": "yandex_maps_traffic",
-      "target_id": "68823159658ea3e4",
-      "target_label": "Лукойл / улица Поляны",
-      "query": "Лукойл улица Поляны Пермь АЗС",
-      "url": "https://yandex.ru/maps/50/perm/search/%D0%9B%D1%83%D0%BA%D0%BE%D0%B9%D0%BB%20%D1%83%D0%BB%D0%B8%D1%86%D0%B0%20%D0%9F%D0%BE%D0%BB%D1%8F%D0%BD%D1%8B%20%D0%9F%D0%B5%D1%80%D0%BC%D1%8C%20%D0%90%D0%97%D0%A1/?ll=56.2502%2C58.0105&z=14&traffic=1",
+      "target_id": "perm-general",
+      "target_label": "Пермь: общий обзор АЗС АИ-95",
+      "query": "АЗС АИ-95 Пермь",
+      "url": "https://yandex.ru/maps/50/perm/?ll=0%2C0&z=17&l=map%2Ctrf&pt=0,0,pm2rdm&text=%D0%90%D0%97%D0%A1%20%D0%90%D0%98-95%20%D0%9F%D0%B5%D1%80%D0%BC%D1%8C",
       "ok": true,
       "status": "screenshot_saved",
-      "screenshot_path": "screenshots/stations/68823159658ea3e4-yandex.png",
-      "started_at": "2026-07-08T12:38:20.713Z",
-      "finished_at": "2026-07-08T12:38:43.554Z",
-      "message": "Скриншот сохранён. Это визуальный слой пробок, не подтверждение наличия АИ-95."
+      "screenshot_path": "screenshots/stations/perm-general-yandex.png",
+      "started_at": "2026-07-08T12:52:23.075Z",
+      "finished_at": "2026-07-08T12:52:53.837Z",
+      "message": "Скриншот сохранён. Яндекс открыт с параметром l=map,trf для слоя пробок."
     },
     {
       "source": "2gis_traffic",
-      "target_id": "68823159658ea3e4",
-      "target_label": "Лукойл / улица Поляны",
-      "query": "Лукойл улица Поляны Пермь АЗС",
-      "url": "https://2gis.ru/perm/search/%D0%9B%D1%83%D0%BA%D0%BE%D0%B9%D0%BB%20%D1%83%D0%BB%D0%B8%D1%86%D0%B0%20%D0%9F%D0%BE%D0%BB%D1%8F%D0%BD%D1%8B%20%D0%9F%D0%B5%D1%80%D0%BC%D1%8C%20%D0%90%D0%97%D0%A1?traffic",
+      "target_id": "perm-general",
+      "target_label": "Пермь: общий обзор АЗС АИ-95",
+      "query": "АЗС АИ-95 Пермь",
+      "url": "https://2gis.ru/perm/search/%D0%90%D0%97%D0%A1%20%D0%90%D0%98-95%20%D0%9F%D0%B5%D1%80%D0%BC%D1%8C?m=0%2C0%2F17&traffic",
       "ok": true,
       "status": "screenshot_saved",
-      "screenshot_path": "screenshots/stations/68823159658ea3e4-2gis.png",
-      "started_at": "2026-07-08T12:38:43.554Z",
-      "finished_at": "2026-07-08T12:39:17.663Z",
+      "screenshot_path": "screenshots/stations/perm-general-2gis.png",
+      "started_at": "2026-07-08T12:52:53.837Z",
+      "finished_at": "2026-07-08T12:53:31.603Z",
       "message": "Скриншот сохранён. Это визуальный слой пробок, не подтверждение наличия АИ-95."
     }
   ]
