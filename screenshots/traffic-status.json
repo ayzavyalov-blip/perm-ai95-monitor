@@ -1,0 +1,26 @@
+{
+  "generated_at": "2026-07-08T11:42:23.783Z",
+  "note": "Скриншоты пробок являются вспомогательным визуальным слоем и не подтверждают наличие АИ-95.",
+  "results": [
+    {
+      "source": "yandex_maps_traffic",
+      "url": "https://yandex.ru/maps/50/perm/probki/",
+      "ok": true,
+      "status": "screenshot_saved",
+      "screenshot_path": "screenshots/yandex-traffic.png",
+      "started_at": "2026-07-08T11:41:22.311Z",
+      "finished_at": "2026-07-08T11:41:53.732Z",
+      "message": "Скриншот сохранён. Это визуальный слой пробок, не подтверждение наличия АИ-95."
+    },
+    {
+      "source": "2gis_traffic",
+      "url": "https://2gis.ru/perm?traffic",
+      "ok": true,
+      "status": "screenshot_saved",
+      "screenshot_path": "screenshots/2gis-traffic.png",
+      "started_at": "2026-07-08T11:41:53.732Z",
+      "finished_at": "2026-07-08T11:42:23.757Z",
+      "message": "Скриншот сохранён. Это визуальный слой пробок, не подтверждение наличия АИ-95."
+    }
+  ]
+}
