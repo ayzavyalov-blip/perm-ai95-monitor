@@ -5,171 +5,40 @@
   <title>АИ-95 Пермь: мониторинг</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
-    :root {
-      font-family: Arial, sans-serif;
-      color: #1f2937;
-      background: #f8fafc;
-    }
-
-    body {
-      margin: 0;
-      padding: 24px;
-    }
-
-    .container {
-      max-width: 1180px;
-      margin: 0 auto;
-    }
-
-    h1 {
-      margin: 0 0 8px;
-      font-size: 28px;
-    }
-
-    h2 {
-      margin-top: 0;
-    }
-
-    .muted {
-      color: #64748b;
-      font-size: 14px;
-    }
-
-    .card {
-      background: white;
-      border: 1px solid #e2e8f0;
-      border-radius: 14px;
-      padding: 16px;
-      margin: 16px 0;
-      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
-    }
-
-    .status-ok {
-      color: #166534;
-      font-weight: 700;
-    }
-
-    .status-warn {
-      color: #92400e;
-      font-weight: 700;
-    }
-
-    .status-bad {
-      color: #991b1b;
-      font-weight: 700;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      background: white;
-      font-size: 14px;
-    }
-
-    th, td {
-      border-bottom: 1px solid #e2e8f0;
-      padding: 10px;
-      text-align: left;
-      vertical-align: top;
-    }
-
-    th {
-      background: #f1f5f9;
-      font-weight: 700;
-    }
-
-    code {
-      background: #f1f5f9;
-      padding: 2px 5px;
-      border-radius: 5px;
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 12px;
-    }
-
-    .small {
-      font-size: 13px;
-    }
-
-    .pill {
-      display: inline-block;
-      padding: 3px 8px;
-      border-radius: 999px;
-      background: #e2e8f0;
-      margin: 2px 4px 2px 0;
-      font-size: 12px;
-    }
-
-    a {
-      color: #1d4ed8;
-    }
-
-    .button {
-      display: inline-block;
-      padding: 10px 14px;
-      border-radius: 8px;
-      background: #1d4ed8;
-      color: white;
-      text-decoration: none;
-      font-weight: 700;
-    }
-
-    .button:hover {
-      background: #1e40af;
-    }
-
-    .top-actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 12px;
-    }
-
-    .secondary-button {
-      display: inline-block;
-      padding: 10px 14px;
-      border-radius: 8px;
-      background: #e2e8f0;
-      color: #0f172a;
-      text-decoration: none;
-      font-weight: 700;
-    }
-
-    .secondary-button:hover {
-      background: #cbd5e1;
-    }
-
-    .nowrap {
-      white-space: nowrap;
-    }
-
+    :root { font-family: Arial, sans-serif; color: #1f2937; background: #f8fafc; }
+    body { margin: 0; padding: 24px; }
+    .container { max-width: 1180px; margin: 0 auto; }
+    h1 { margin: 0 0 8px; font-size: 28px; }
+    h2 { margin-top: 0; }
+    h3 { margin-bottom: 8px; }
+    .muted { color: #64748b; font-size: 14px; }
+    .card { background: white; border: 1px solid #e2e8f0; border-radius: 14px; padding: 16px; margin: 16px 0; box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04); }
+    .status-ok { color: #166534; font-weight: 700; }
+    .status-warn { color: #92400e; font-weight: 700; }
+    .status-bad { color: #991b1b; font-weight: 700; }
+    table { width: 100%; border-collapse: collapse; background: white; font-size: 14px; }
+    th, td { border-bottom: 1px solid #e2e8f0; padding: 10px; text-align: left; vertical-align: top; }
+    th { background: #f1f5f9; font-weight: 700; }
+    code { background: #f1f5f9; padding: 2px 5px; border-radius: 5px; }
+    .small { font-size: 13px; }
+    .pill { display: inline-block; padding: 3px 8px; border-radius: 999px; background: #e2e8f0; margin: 2px 4px 2px 0; font-size: 12px; }
+    a { color: #1d4ed8; }
+    .button { display: inline-block; padding: 10px 14px; border-radius: 8px; background: #1d4ed8; color: white; text-decoration: none; font-weight: 700; }
+    .button:hover { background: #1e40af; }
+    .top-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
+    .secondary-button { display: inline-block; padding: 10px 14px; border-radius: 8px; background: #e2e8f0; color: #0f172a; text-decoration: none; font-weight: 700; }
+    .secondary-button:hover { background: #cbd5e1; }
+    .nowrap { white-space: nowrap; }
+    .traffic-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px; margin-top: 12px; }
+    .traffic-image { width: 100%; max-height: 760px; object-fit: contain; border: 1px solid #e2e8f0; border-radius: 12px; background: #f8fafc; }
+    .image-caption { font-size: 13px; color: #64748b; margin-top: 6px; }
     @media (max-width: 720px) {
-      body {
-        padding: 14px;
-      }
-
-      h1 {
-        font-size: 24px;
-      }
-
-      table {
-        font-size: 12px;
-      }
-
-      th, td {
-        padding: 8px;
-      }
-
-      .card {
-        padding: 14px;
-      }
-
-      .table-wrap {
-        overflow-x: auto;
-      }
+      body { padding: 14px; }
+      h1 { font-size: 24px; }
+      table { font-size: 12px; }
+      th, td { padding: 8px; }
+      .card { padding: 14px; }
+      .table-wrap { overflow-x: auto; }
     }
   </style>
 </head>
@@ -181,32 +50,39 @@
 
   <div class="card">
     <h2>Ручной запуск</h2>
-    <p>
-      Автоматический сбор выполняется через GitHub Actions. Для ручного запуска откройте workflow и нажмите
-      <b>Run workflow</b>.
-    </p>
+    <p>Автоматический сбор выполняется через GitHub Actions. Для ручного запуска откройте workflow и нажмите <b>Run workflow</b>.</p>
     <div class="top-actions">
-      <a id="runWorkflowLink" class="button" href="#" target="_blank" rel="noopener">
-        Открыть запуск GitHub Actions
-      </a>
-      <a id="repoLink" class="secondary-button" href="#" target="_blank" rel="noopener">
-        Открыть репозиторий
-      </a>
-      <a id="latestJsonLink" class="secondary-button" href="data/latest.json" target="_blank" rel="noopener">
-        Открыть latest.json
-      </a>
+      <a id="runWorkflowLink" class="button" href="#" target="_blank" rel="noopener">Открыть запуск GitHub Actions</a>
+      <a id="repoLink" class="secondary-button" href="#" target="_blank" rel="noopener">Открыть репозиторий</a>
+      <a class="secondary-button" href="data/latest.json" target="_blank" rel="noopener">Открыть latest.json</a>
     </div>
-    <p class="muted">
-      Прямой запуск без перехода на GitHub не включён: для него нужен GitHub token, а токен нельзя хранить в статической странице.
-    </p>
+    <p class="muted">Прямой запуск без перехода на GitHub не включён: для него нужен GitHub token, а токен нельзя хранить в статической странице.</p>
   </div>
 
   <div id="summary" class="card">Загрузка данных...</div>
 
   <div class="card">
     <h2>Рекомендации</h2>
-    <div class="muted">Цена и пробка не считаются самостоятельным подтверждением наличия АИ-95.</div>
+    <div class="muted">Цена полностью исключена из агента. Пробка не считается самостоятельным подтверждением наличия АИ-95.</div>
     <div id="recommendations"></div>
+  </div>
+
+  <div class="card">
+    <h2>Пробки, автоскриншоты</h2>
+    <p class="muted">Скриншоты создаются в GitHub Actions через Playwright. Это только визуальный слой: пробка у АЗС не подтверждает наличие АИ-95.</p>
+    <div id="trafficStatus" class="muted">Загрузка статуса скриншотов...</div>
+    <div class="traffic-grid">
+      <div>
+        <h3>Яндекс Карты / Пробки</h3>
+        <img id="yandexTrafficImage" class="traffic-image" alt="Скриншот Яндекс Карт с пробками">
+        <div class="image-caption">Если вместо карты видна ошибка, значит GitHub Actions не смог открыть карту или сайт ограничил автоматический доступ.</div>
+      </div>
+      <div>
+        <h3>2ГИС / Пробки</h3>
+        <img id="gisTrafficImage" class="traffic-image" alt="Скриншот 2ГИС с пробками">
+        <div class="image-caption">Используйте этот скрин только как дополнительную проверку маршрута и возможной очереди у въезда на АЗС.</div>
+      </div>
+    </div>
   </div>
 
   <div class="card">
@@ -221,7 +97,8 @@
       <li>Отметка 20-60 минут: средний сигнал.</li>
       <li>Старше 60 минут: нужен звонок или второй источник.</li>
       <li>Пробка у въезда на АЗС: вспомогательный сигнал очереди, но не доказательство наличия АИ-95.</li>
-      <li>Опубликованная цена: не доказательство наличия АИ-95.</li>
+      <li>Цена не используется и не отображается.</li>
+      <li>Автоскриншот карты: визуальная подсказка, а не структурированные данные о наличии топлива.</li>
     </ul>
   </div>
 </div>
@@ -230,15 +107,12 @@
 function getRepoInfoFromPageUrl() {
   const host = window.location.hostname;
   const pathParts = window.location.pathname.split('/').filter(Boolean);
-
   let owner = 'azyavyalov-blip';
   let repo = 'perm-ai95-monitor';
 
   if (host.endsWith('.github.io')) {
     owner = host.replace('.github.io', '');
-    if (pathParts.length > 0) {
-      repo = pathParts[0];
-    }
+    if (pathParts.length > 0) repo = pathParts[0];
   }
 
   return { owner, repo };
@@ -246,16 +120,11 @@ function getRepoInfoFromPageUrl() {
 
 function setupLinks() {
   const { owner, repo } = getRepoInfoFromPageUrl();
-  const workflowFile = 'update.yml';
-
-  const workflowUrl = `https://github.com/${owner}/${repo}/actions/workflows/${workflowFile}`;
+  const workflowUrl = `https://github.com/${owner}/${repo}/actions/workflows/update.yml`;
   const repoUrl = `https://github.com/${owner}/${repo}`;
 
-  const workflowLink = document.getElementById('runWorkflowLink');
-  const repoLink = document.getElementById('repoLink');
-
-  if (workflowLink) workflowLink.href = workflowUrl;
-  if (repoLink) repoLink.href = repoUrl;
+  document.getElementById('runWorkflowLink').href = workflowUrl;
+  document.getElementById('repoLink').href = repoUrl;
 }
 
 async function loadData() {
@@ -264,37 +133,26 @@ async function loadData() {
   return await res.json();
 }
 
+async function loadTrafficStatus() {
+  const res = await fetch('screenshots/traffic-status.json?ts=' + Date.now());
+  if (!res.ok) throw new Error('traffic-status.json пока не создан');
+  return await res.json();
+}
+
 function esc(s) {
-  return String(s ?? '').replace(/[&<>"']/g, ch => ({
-    '&': '&amp;',
-    '<': '&lt;',
-    '>': '&gt;',
-    '"': '&quot;',
-    "'": '&#39;'
-  }[ch]));
+  return String(s ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
 }
 
 function statusClass(status) {
-  if (['parsed_partial'].includes(status)) return 'status-ok';
-
-  if ([
-    'map_dynamic_no_station_rows',
-    'no_station_rows',
-    'manual_or_app_required',
-    'unknown'
-  ].includes(status)) {
-    return 'status-warn';
-  }
-
+  if (['parsed_partial', 'screenshot_saved'].includes(status)) return 'status-ok';
+  if (['map_dynamic_no_station_rows', 'manual_or_app_required', 'unknown'].includes(status)) return 'status-warn';
   return 'status-bad';
 }
 
 function formatDate(value) {
   if (!value) return 'нет данных';
-
   const d = new Date(value);
   if (Number.isNaN(d.getTime())) return value;
-
   return d.toLocaleString('ru-RU');
 }
 
@@ -304,19 +162,16 @@ function hasHardRecommendation(data) {
 }
 
 function renderSummary(data) {
-  const gen = formatDate(data.generated_at);
   const hardRecommendation = hasHardRecommendation(data);
-
   document.getElementById('summary').innerHTML = `
     <h2>Последняя проверка</h2>
     <div>Город: <b>${esc(data.city)}</b></div>
     <div>Топливо: <b>${esc(data.fuel)}</b></div>
-    <div>Время генерации: <b>${esc(gen)}</b></div>
-    <div style="margin-top: 10px">
+    <div>Время генерации: <b>${esc(formatDate(data.generated_at))}</b></div>
+    <div style="margin-top:10px">
       ${hardRecommendation
         ? '<span class="status-ok">Есть кандидаты, но перед выездом проверьте свежесть и источник.</span>'
-        : '<span class="status-warn">Нет достаточно надёжной конкретной АЗС для рекомендации.</span>'
-      }
+        : '<span class="status-warn">Нет достаточно надёжной конкретной АЗС для рекомендации.</span>'}
     </div>
     <p class="muted">${esc(data.operator_message || '')}</p>
   `;
@@ -324,12 +179,9 @@ function renderSummary(data) {
 
 function renderRecommendations(data) {
   const rows = data.recommendations || [];
-
   if (!rows.length) {
     document.getElementById('recommendations').innerHTML = `
-      <p class="status-warn">
-        Конкретных АЗС для поездки нет. Источники не отдали свежие станционные данные в пригодном формате.
-      </p>
+      <p class="status-warn">Конкретных АЗС для поездки нет. Нет свежего машинного подтверждения по конкретной точке.</p>
     `;
     return;
   }
@@ -342,7 +194,6 @@ function renderRecommendations(data) {
             <th>АЗС</th>
             <th>Адрес</th>
             <th>Статус</th>
-            <th>Цена</th>
             <th>Доверие</th>
             <th>Источники</th>
             <th>Действие</th>
@@ -354,7 +205,6 @@ function renderRecommendations(data) {
               <td>${esc(r.station_name || 'нет данных')}</td>
               <td>${esc(r.address || 'нет данных')}</td>
               <td class="${statusClass(r.status || 'unknown')}">${esc(r.status || 'unknown')}</td>
-              <td class="nowrap">${r.price_rub ? esc(r.price_rub) + ' руб.' : 'нет данных'}</td>
               <td class="nowrap">${Math.round(Number(r.confidence || 0) * 100)}%</td>
               <td>${(r.sources || []).map(s => `<span class="pill">${esc(s)}</span>`).join('')}</td>
               <td>${esc(r.action || '')}</td>
@@ -363,21 +213,14 @@ function renderRecommendations(data) {
         </tbody>
       </table>
     </div>
-    <p class="muted">
-      Если статус unknown или доверие ниже 60%, это не является рекомендацией ехать на АЗС.
-    </p>
+    <p class="muted">Если статус unknown или доверие ниже 60%, это не является рекомендацией ехать на АЗС.</p>
   `;
 }
 
 function renderSources(data) {
   const rows = data.source_results || [];
-
   if (!rows.length) {
-    document.getElementById('sources').innerHTML = `
-      <p class="status-warn">
-        Источники не загружены. Вероятно, открыт демо-файл или workflow ещё не записал обновлённый data/latest.json.
-      </p>
-    `;
+    document.getElementById('sources').innerHTML = '<p class="status-warn">Источники не загружены.</p>';
     return;
   }
 
@@ -411,7 +254,32 @@ function renderSources(data) {
   `;
 }
 
+function renderTrafficImages() {
+  const ts = Date.now();
+  document.getElementById('yandexTrafficImage').src = `screenshots/yandex-traffic.png?ts=${ts}`;
+  document.getElementById('gisTrafficImage').src = `screenshots/2gis-traffic.png?ts=${ts}`;
+
+  loadTrafficStatus()
+    .then(status => {
+      const rows = status.results || [];
+      document.getElementById('trafficStatus').innerHTML = `
+        <div>Время создания: <b>${esc(formatDate(status.generated_at))}</b></div>
+        <div style="margin-top:6px">
+          ${rows.map(r => `<span class="${statusClass(r.status)}">${esc(r.source)}: ${esc(r.status)}</span>`).join(' | ')}
+        </div>
+        <p class="muted">${esc(status.note || '')}</p>
+      `;
+    })
+    .catch(err => {
+      document.getElementById('trafficStatus').innerHTML = `
+        <span class="status-warn">Скриншоты пока не созданы. Запустите GitHub Actions workflow.</span>
+        <div class="muted">${esc(err.message)}</div>
+      `;
+    });
+}
+
 setupLinks();
+renderTrafficImages();
 
 loadData()
   .then(data => {
@@ -421,11 +289,7 @@ loadData()
   })
   .catch(err => {
     document.getElementById('summary').innerHTML = `<span class="status-bad">${esc(err.message)}</span>`;
-    document.getElementById('recommendations').innerHTML = `
-      <p class="status-warn">
-        Проверьте, что файл <code>data/latest.json</code> есть в репозитории и доступен через GitHub Pages.
-      </p>
-    `;
+    document.getElementById('recommendations').innerHTML = '<p class="status-warn">Проверьте файл <code>data/latest.json</code>.</p>';
   });
 </script>
 </body>
