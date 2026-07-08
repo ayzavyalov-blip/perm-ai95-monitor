@@ -91,14 +91,13 @@ jobs:
 
       - name: Install Playwright
         run: |
-          npm install
+          npm install --no-audit --no-fund
           npx playwright install --with-deps chromium
 
       - name: Make traffic screenshots
-        continue-on-error: true
         run: |
           mkdir -p screenshots
-          npx playwright test
+          node scripts/make-traffic-screenshots.js
 
       - name: Commit updated data and screenshots
         run: |

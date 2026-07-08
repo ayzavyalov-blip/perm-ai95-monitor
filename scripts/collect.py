@@ -23,7 +23,7 @@ HISTORY_DIR = OUT_DIR / "history"
 USER_AGENT = (
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
     "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 "
-    "PermAI95Monitor/0.4"
+    "PermAI95Monitor/0.5"
 )
 
 REQUEST_TIMEOUT = 25
@@ -113,86 +113,115 @@ def row_mentions_ai95(text: str) -> bool:
     return bool(re.search(r"(АИ\s*[-]?\s*95|AI\s*[-]?\s*95|бензин\s*95|95\s*бензин)", text, re.I))
 
 
-def generic_ai95_extract(source: str, url: str, html: str) -> list[dict[str, Any]]:
+def extract_station_observations(source: str, url: str, html: str) -> list[dict[str, Any]]:
+    """
+    Извлекает только относительно станционные наблюдения.
+    Просто фраза "АИ-95" на странице больше не превращается в рекомендацию "АЗС / нет данных".
+    """
     soup = BeautifulSoup(html, "html.parser")
     observations: list[dict[str, Any]] = []
-
-    selectors = ["table tr", "li", "article", "section", "div"]
     seen: set[str] = set()
 
-    for selector in selectors:
-        for node in soup.select(selector):
-            text = clean(node.get_text(" "))
-            if len(text) < 20 or len(text) > 1500:
-                continue
-            if not row_mentions_ai95(text):
-                continue
+    for node in soup.select("table tr, li, article, section, div"):
+        text = clean(node.get_text(" "))
+        if len(text) < 30 or len(text) > 1500:
+            continue
+        if not row_mentions_ai95(text):
+            continue
 
-            key = text_hash(text)
-            if key in seen:
-                continue
-            seen.add(key)
+        station = None
+        brand_match = re.search(
+            r"(ЛУКОЙЛ|Газпромнефть|Газпром|Нефтехимпром|Экойл|Ликом|Teboil|Роснефть|Get Petrol|Башнефть)",
+            text,
+            re.I,
+        )
+        if brand_match:
+            station = brand_match.group(1)
 
-            address = None
-            address_match = re.search(
-                r"((ул\.|улица|шоссе|проспект|пр-т|тракт|дорога|бульвар|переулок)[^,;\"']{3,100})",
-                text,
-                flags=re.I,
-            )
-            if address_match:
-                address = clean(address_match.group(1))
+        address = None
+        address_match = re.search(
+            r"((ул\.|улица|шоссе|проспект|пр-т|тракт|дорога|бульвар|переулок)[^,;\"']{3,110})",
+            text,
+            flags=re.I,
+        )
+        if address_match:
+            address = clean(address_match.group(1))
 
-            station = "АЗС"
-            brand_match = re.search(
-                r"(ЛУКОЙЛ|Газпромнефть|Газпром|Нефтехимпром|Экойл|Ликом|Teboil|Роснефть|Get Petrol|Башнефть)",
-                text,
-                re.I,
-            )
-            if brand_match:
-                station = brand_match.group(1)
+        queue_text = None
+        queue_match = re.search(r"очеред[ьи][^.;,]{0,80}", text, re.I)
+        if queue_match:
+            queue_text = clean(queue_match.group(0))
 
-            queue_text = None
-            queue_match = re.search(r"очеред[ьи][^.;,]{0,80}", text, re.I)
-            if queue_match:
-                queue_text = clean(queue_match.group(0))
+        limit_text = None
+        limit_match = re.search(r"лимит[^.;,]{0,80}|\d{1,3}\s*л\b", text, re.I)
+        if limit_match:
+            limit_text = clean(limit_match.group(0))
 
-            limit_text = None
-            limit_match = re.search(r"лимит[^.;,]{0,80}|\d{1,3}\s*л\b", text, re.I)
-            if limit_match:
-                limit_text = clean(limit_match.group(0))
+        observed_at_text = None
+        time_match = re.search(r"(\d{1,2}\s*(мин|час)[а-я]*\s*назад|только что|сегодня[^.;,]{0,30})", text, re.I)
+        if time_match:
+            observed_at_text = clean(time_match.group(0))
 
-            observed_at_text = None
-            time_match = re.search(r"(\d{1,2}\s*(мин|час)[а-я]*\s*назад|только что|сегодня[^.;,]{0,30})", text, re.I)
-            if time_match:
-                observed_at_text = clean(time_match.group(0))
+        # Ключевая защита: если нет бренда, адреса, времени, очереди или лимита, это не станционное наблюдение.
+        if not any([station, address, observed_at_text, queue_text, limit_text]):
+            continue
 
-            observations.append(
-                asdict(
-                    Observation(
-                        station_name=station,
-                        address=address,
-                        fuel=FUEL,
-                        availability_status="unknown",
-                        limit_text=limit_text,
-                        queue_text=queue_text,
-                        observed_at_text=observed_at_text,
-                        source=source,
-                        source_url=url,
-                        confidence=0.25 if observed_at_text else 0.15,
-                        note="Найдено упоминание АИ-95 в HTML. Это слабый сигнал, нужна проверка свежести и конкретной АЗС.",
-                    )
+        key = text_hash((station or "") + "|" + (address or "") + "|" + text[:250])
+        if key in seen:
+            continue
+        seen.add(key)
+
+        confidence = 0.15
+        if station or address:
+            confidence = 0.25
+        if observed_at_text:
+            confidence = 0.35
+        if queue_text or limit_text:
+            confidence = max(confidence, 0.30)
+
+        observations.append(
+            asdict(
+                Observation(
+                    station_name=station or "АЗС",
+                    address=address,
+                    fuel=FUEL,
+                    availability_status="unknown",
+                    limit_text=limit_text,
+                    queue_text=queue_text,
+                    observed_at_text=observed_at_text,
+                    source=source,
+                    source_url=url,
+                    confidence=confidence,
+                    note="Найдено частичное станционное упоминание АИ-95. Нужна проверка свежести и конкретной точки на карте.",
                 )
             )
+        )
 
-            if len(observations) >= 30:
-                return observations
+        if len(observations) >= 20:
+            break
 
     return observations
 
 
+def extract_general_signals(text: str) -> list[str]:
+    signals = []
+    for pattern in [
+        r"(\d+)\s+АЗС\s+на\s+карте",
+        r"(\d+)\s+АЗС\s+со\s+свежими\s+отметками",
+        r"(\d+)\s+заправок\s+в\s+Перми",
+        r"(\d+)\s+со\s+свежими\s+отметками",
+        r"АИ\s*[-]?\s*95",
+        r"AI\s*[-]?\s*95",
+    ]:
+        match = re.search(pattern, text, flags=re.I)
+        if match:
+            value = match.group(0)
+            if value not in signals:
+                signals.append(value)
+    return signals[:8]
+
+
 def parse_gdebenz() -> SourceResult:
-    # Старый URL /fuel/ai-95/perm заменён на публичные страницы, которые видны в поиске:
-    # /perm и /fuel/ai-95. Это исправляет ошибку маршрута, но не гарантирует решение DNS-сбоя GitHub Actions.
     urls = [
         "https://gdebenz.ru/perm",
         "https://gdebenz.ru/fuel/ai-95",
@@ -214,21 +243,8 @@ def parse_gdebenz() -> SourceResult:
 
         soup = BeautifulSoup(html, "html.parser")
         text = clean(soup.get_text(" "))
-
-        observations = generic_ai95_extract("gdebenz", url, html)
-
-        counts = []
-        for pattern in [
-            r"(\d+)\s+АЗС\s+на\s+карте",
-            r"(\d+)\s+АЗС\s+со\s+свежими\s+отметками",
-            r"(\d+)\s+заправок\s+в\s+Перми",
-            r"(\d+)\s+со\s+свежими\s+отметками",
-            r"АИ\s*[-]?\s*95",
-            r"AI\s*[-]?\s*95",
-        ]:
-            match = re.search(pattern, text, flags=re.I)
-            if match:
-                counts.append(match.group(0))
+        observations = extract_station_observations("gdebenz", url, html)
+        signals = extract_general_signals(text)
 
         if observations:
             return SourceResult(
@@ -240,9 +256,9 @@ def parse_gdebenz() -> SourceResult:
                 checked_at=checked_at,
                 http_status=http_status,
                 message=(
-                    "Источник доступен, найдены частичные упоминания АИ-95. "
-                    "Для рекомендации нужна ручная проверка конкретной точки на карте."
-                    + (" Общий сигнал: " + "; ".join(counts) if counts else "")
+                    "Источник доступен, найдены частичные станционные упоминания АИ-95. "
+                    "Это не готовая рекомендация: нужна ручная проверка конкретной точки."
+                    + (" Общий сигнал: " + "; ".join(signals) if signals else "")
                 ),
                 observations=observations,
                 raw_hash=text_hash(text[:200000]),
@@ -259,12 +275,16 @@ def parse_gdebenz() -> SourceResult:
             message=(
                 "Источник доступен, но конкретные АЗС не извлечены из HTML. "
                 "Вероятно, данные карты подгружаются динамически. "
-                "Нужен визуальный скрин или отдельный парсер динамических данных."
-                + (" Общий сигнал: " + "; ".join(counts) if counts else "")
+                "Нужен визуальный скрин или ручная проверка точки."
+                + (" Общий сигнал: " + "; ".join(signals) if signals else "")
             ),
             observations=[],
             raw_hash=text_hash(text[:200000]),
         )
+
+    short_errors = " | ".join(errors[-3:])
+    if len(short_errors) > 700:
+        short_errors = short_errors[:700] + "..."
 
     return SourceResult(
         source="gdebenz",
@@ -275,9 +295,9 @@ def parse_gdebenz() -> SourceResult:
         checked_at=checked_at,
         http_status=None,
         message=(
-            "Не удалось открыть gdebenz. Workflow сначала пробует обычный DNS, затем публичные DNS и /etc/hosts. "
-            "Если ошибка остаётся, причина не в вашем локальном VPN, а в доступности домена из GitHub Actions. "
-            "Ошибки: " + " | ".join(errors[-6:])
+            "Не удалось открыть gdebenz из GitHub Actions. Проверьте Network diagnostics и DNS-fallback в workflow. "
+            "Локальный VPN пользователя на GitHub Actions не влияет. "
+            "Кратко: " + short_errors
         ),
     )
 
@@ -295,22 +315,23 @@ def external_source(name: str, url: str, role: str, message: str) -> SourceResul
 
 
 def compute_recommendations(source_results: list[SourceResult]) -> list[dict[str, Any]]:
-    # Рекомендации оставляем только по фактическим наблюдениям gdebenz.
-    # Т-Банк, Яндекс/2ГИС здесь не дают машинного подтверждения наличия.
     observations: list[dict[str, Any]] = []
     for src in source_results:
         if src.source == "gdebenz":
             observations.extend(src.observations)
 
-    if not observations:
-        return []
-
     rows = []
     for obs in observations:
+        # Не показываем "АЗС / нет данных" как рекомендацию.
+        station = obs.get("station_name") or ""
+        address = obs.get("address")
+        if station == "АЗС" and not address:
+            continue
+
         rows.append(
             {
-                "station_name": obs.get("station_name"),
-                "address": obs.get("address"),
+                "station_name": station or "АЗС",
+                "address": address,
                 "fuel": FUEL,
                 "status": obs.get("availability_status", "unknown"),
                 "confidence": obs.get("confidence", 0),
@@ -353,7 +374,7 @@ def main() -> int:
     generated_at = now_iso()
 
     payload = {
-        "schema_version": "0.4",
+        "schema_version": "0.5",
         "city": CITY,
         "fuel": FUEL,
         "generated_at": generated_at,
@@ -361,6 +382,7 @@ def main() -> int:
             "price_sources_removed": True,
             "price_is_not_used": True,
             "traffic_is_auxiliary_signal_only": True,
+            "do_not_recommend_generic_unknown_station": True,
             "freshness_threshold_minutes": {
                 "strong": 20,
                 "medium": 60,
@@ -385,8 +407,7 @@ def main() -> int:
         "recommendations": compute_recommendations(source_results),
         "operator_message": (
             "Оставлены только 4 источника: gdebenz, tbank_fuel, yandex_maps_traffic, 2gis_traffic. "
-            "Ценовые источники удалены. Если gdebenz недоступен из GitHub Actions, проверьте шаг DNS diagnostics и Try to fix gdebenz DNS. "
-            "Локальный VPN пользователя не влияет на GitHub Actions runner."
+            "Ценовые источники удалены. Общие упоминания АИ-95 больше не превращаются в рекомендацию по неизвестной АЗС."
         ),
     }
 
