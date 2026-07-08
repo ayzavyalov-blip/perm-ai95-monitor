@@ -3,7 +3,6 @@ from __future__ import annotations
 import hashlib
 import json
 import re
-import sys
 from dataclasses import dataclass, asdict, field
 from datetime import datetime, timezone
 from pathlib import Path
@@ -11,6 +10,8 @@ from typing import Any, Optional
 
 import requests
 from bs4 import BeautifulSoup
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 
 
 CITY = "Пермь"
@@ -19,11 +20,12 @@ OUT_DIR = Path("data")
 HISTORY_DIR = OUT_DIR / "history"
 
 USER_AGENT = (
-    "Mozilla/5.0 (compatible; PermAI95Monitor/0.1; "
-    "+https://github.com/your-org/perm-ai95-monitor)"
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+    "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 "
+    "PermAI95Monitor/0.2"
 )
 
-REQUEST_TIMEOUT = 20
+REQUEST_TIMEOUT = 25
 
 
 @dataclass
@@ -64,32 +66,55 @@ def text_hash(text: str) -> str:
     return hashlib.sha256(text.encode("utf-8", errors="ignore")).hexdigest()[:16]
 
 
+def make_session() -> requests.Session:
+    retry = Retry(
+        total=3,
+        connect=3,
+        read=2,
+        backoff_factor=1.2,
+        status_forcelist=(429, 500, 502, 503, 504),
+        allowed_methods=("GET", "HEAD"),
+        raise_on_status=False,
+    )
+    adapter = HTTPAdapter(max_retries=retry)
+    s = requests.Session()
+    s.mount("https://", adapter)
+    s.mount("http://", adapter)
+    s.headers.update(
+        {
+            "User-Agent": USER_AGENT,
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+            "Accept-Language": "ru-RU,ru;q=0.9,en;q=0.7",
+            "Cache-Control": "no-cache",
+        }
+    )
+    return s
+
+
+SESSION = make_session()
+
+
 def fetch(url: str) -> tuple[int | None, str, str | None]:
     try:
-        r = requests.get(
-            url,
-            timeout=REQUEST_TIMEOUT,
-            headers={
-                "User-Agent": USER_AGENT,
-                "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-                "Accept-Language": "ru-RU,ru;q=0.9,en;q=0.7",
-            },
-        )
+        r = SESSION.get(url, timeout=REQUEST_TIMEOUT, allow_redirects=True)
         return r.status_code, r.text, None
     except requests.RequestException as exc:
-        return None, "", str(exc)
+        return None, "", repr(exc)
 
 
 def parse_price(value: str) -> float | None:
     if not value:
         return None
-    m = re.search(r"(\d{2,3}[,.]\d{1,2}|\d{2,3})", value.replace("\xa0", " "))
-    if not m:
-        return None
-    try:
-        return float(m.group(1).replace(",", "."))
-    except ValueError:
-        return None
+    text = value.replace("\xa0", " ")
+    candidates = re.findall(r"(?<!\d)(\d{2,3}[,.]\d{1,2}|\d{2,3})(?!\d)", text)
+    for c in candidates:
+        try:
+            v = float(c.replace(",", "."))
+        except ValueError:
+            continue
+        if 30 <= v <= 200:
+            return v
+    return None
 
 
 def clean(s: str | None) -> str:
@@ -98,31 +123,30 @@ def clean(s: str | None) -> str:
     return re.sub(r"\s+", " ", s).strip()
 
 
+def row_mentions_ai95(text: str) -> bool:
+    return bool(re.search(r"(АИ\s*[-]?\s*95|AI\s*[-]?\s*95|бензин\s*95|95\s*бензин)", text, re.I))
+
+
 def generic_table_extract(source: str, url: str, html: str) -> list[dict[str, Any]]:
-    """
-    Универсальная попытка вытащить строки из HTML-таблиц.
-    Не подменяет полноценный парсер источника, но помогает быстро понять,
-    отдаёт ли сайт данные в статическом HTML.
-    """
     soup = BeautifulSoup(html, "html.parser")
     observations: list[dict[str, Any]] = []
 
+    # 1. Обычные таблицы.
     for table in soup.find_all("table"):
-        headers = [clean(th.get_text(" ")) for th in table.find_all("th")]
         for tr in table.find_all("tr"):
-            cells = [clean(td.get_text(" ")) for td in tr.find_all("td")]
+            cells = [clean(td.get_text(" ")) for td in tr.find_all(["td", "th"])]
             if len(cells) < 2:
                 continue
 
             row_text = " | ".join(cells)
-            if not re.search(r"(95|АИ[- ]?95|AI[- ]?95)", row_text, flags=re.I):
+            if not row_mentions_ai95(row_text):
                 continue
 
             price = parse_price(row_text)
-            station = cells[0]
+            station = cells[0] if cells[0] else "АЗС"
             address = None
             for c in cells[1:]:
-                if any(x in c.lower() for x in ["ул.", "улица", "шоссе", "просп", "тракт", "перм"]):
+                if re.search(r"(ул\.|улица|шоссе|проспект|пр-т|тракт|дорога|Перм)", c, re.I):
                     address = c
                     break
 
@@ -145,69 +169,201 @@ def generic_table_extract(source: str, url: str, html: str) -> list[dict[str, An
                 )
             )
 
+    # 2. Карточки без table, если сайт отдаёт div/li.
+    if observations:
+        return observations[:30]
+
+    for node in soup.find_all(["li", "article", "section", "div"]):
+        txt = clean(node.get_text(" "))
+        if len(txt) < 40 or len(txt) > 1200:
+            continue
+        if not row_mentions_ai95(txt):
+            continue
+
+        price = parse_price(txt)
+        address = None
+        address_match = re.search(
+            r"((ул\.|улица|шоссе|проспект|пр-т|тракт|дорога)[^,;\"']{3,90})",
+            txt,
+            flags=re.I,
+        )
+        if address_match:
+            address = clean(address_match.group(1))
+
+        station = "АЗС"
+        brand_match = re.search(r"(ЛУКОЙЛ|Газпромнефть|Газпром|Нефтехимпром|Экойл|Ликом|Teboil|Роснефть|Get Petrol)", txt, re.I)
+        if brand_match:
+            station = brand_match.group(1)
+
+        observations.append(
+            asdict(
+                Observation(
+                    station_name=station,
+                    address=address,
+                    fuel=FUEL,
+                    availability_status="unknown",
+                    price_rub=price,
+                    limit_text=None,
+                    queue_text=None,
+                    observed_at_text=None,
+                    source=source,
+                    source_url=url,
+                    confidence=0.20 if price else 0.12,
+                    note="Найдено упоминание АИ-95 в HTML-блоке. Это слабый сигнал, нужна проверка источника.",
+                )
+            )
+        )
+
+        if len(observations) >= 30:
+            break
+
+    return observations
+
+
+def extract_json_like_ai95(source: str, url: str, html: str) -> list[dict[str, Any]]:
+    observations: list[dict[str, Any]] = []
+
+    text = html
+    # Частичная нормализация unicode escape для кириллицы.
+    try:
+        text = bytes(text, "utf-8").decode("unicode_escape", errors="ignore")
+    except Exception:
+        pass
+
+    seen = set()
+    for m in re.finditer(r".{0,450}(АИ\s*[-]?\s*95|AI\s*[-]?\s*95|95).{0,450}", text, flags=re.I | re.S):
+        chunk = clean(m.group(0))
+        if len(chunk) < 30:
+            continue
+
+        key = text_hash(chunk)
+        if key in seen:
+            continue
+        seen.add(key)
+
+        price = parse_price(chunk)
+
+        address = None
+        address_match = re.search(
+            r"((ул\.|улица|шоссе|проспект|пр-т|тракт|дорога)[^,;\"']{3,90})",
+            chunk,
+            flags=re.I,
+        )
+        if address_match:
+            address = clean(address_match.group(1))
+
+        brand = "АЗС из HTML/JSON-фрагмента"
+        brand_match = re.search(r"(ЛУКОЙЛ|Газпромнефть|Газпром|Нефтехимпром|Экойл|Ликом|Teboil|Роснефть|Get Petrol)", chunk, re.I)
+        if brand_match:
+            brand = brand_match.group(1)
+
+        observations.append(
+            asdict(
+                Observation(
+                    station_name=brand,
+                    address=address,
+                    fuel=FUEL,
+                    availability_status="unknown",
+                    price_rub=price,
+                    limit_text=None,
+                    queue_text=None,
+                    observed_at_text=None,
+                    source=source,
+                    source_url=url,
+                    confidence=0.20 if price else 0.12,
+                    note="Найдено упоминание АИ-95 в HTML/JSON-фрагменте. Это слабый сигнал, нужно уточнить структуру источника.",
+                )
+            )
+        )
+
+        if len(observations) >= 20:
+            break
+
     return observations
 
 
 def parse_gdebenz() -> SourceResult:
-    url = "https://gdebenz.ru/fuel/ai-95/perm"
-    checked_at = now_iso()
-    http_status, html, error = fetch(url)
+    urls = [
+        "https://gdebenz.ru/fuel/ai-95/perm",
+        "https://www.gdebenz.ru/fuel/ai-95/perm",
+        "https://gdebenz.ru/",
+        "https://www.gdebenz.ru/",
+    ]
 
-    if error:
+    checked_at = now_iso()
+    errors = []
+
+    for url in urls:
+        http_status, html, error = fetch(url)
+
+        if error:
+            errors.append(f"{url}: {error}")
+            continue
+
+        soup = BeautifulSoup(html, "html.parser")
+        text = clean(soup.get_text(" "))
+
+        observations = generic_table_extract("gdebenz", url, html)
+        if not observations:
+            observations = extract_json_like_ai95("gdebenz", url, html)
+
+        counts = []
+        for pattern in [
+            r"(\d+)\s+АЗС\s+на\s+карте",
+            r"(\d+)\s+АЗС\s+со\s+свежими\s+отметками",
+            r"(\d+)\s+свеж",
+            r"АИ\s*[-]?\s*95",
+            r"AI\s*[-]?\s*95",
+        ]:
+            m = re.search(pattern, text, flags=re.I)
+            if m:
+                counts.append(m.group(0))
+
+        if observations:
+            return SourceResult(
+                source="gdebenz",
+                url=url,
+                role="availability",
+                ok=True,
+                status="parsed_partial",
+                checked_at=checked_at,
+                http_status=http_status,
+                message="Источник доступен, найдены частичные данные по АИ-95. Требуется ручная проверка качества.",
+                observations=observations,
+                raw_hash=text_hash(text[:200000]),
+            )
+
         return SourceResult(
             source="gdebenz",
             url=url,
             role="availability",
-            ok=False,
-            status="source_unavailable",
+            ok=True,
+            status="map_dynamic_no_station_rows",
             checked_at=checked_at,
             http_status=http_status,
-            message=f"Ошибка запроса: {error}",
+            message=(
+                "Источник доступен, но конкретные АЗС не извлечены из HTML. "
+                "Вероятно, данные карты подгружаются динамически. "
+                "Нужен скрин, ручная выгрузка или отдельный парсер динамических данных."
+                + (" Найден общий текстовый сигнал: " + "; ".join(counts) if counts else "")
+            ),
+            observations=observations,
+            raw_hash=text_hash(text[:200000]),
         )
-
-    soup = BeautifulSoup(html, "html.parser")
-    text = clean(soup.get_text(" "))
-
-    # Для gdebenz часто основная карта динамическая. Если карточки не отданы HTML,
-    # фиксируем общий сигнал, но не придумываем станции.
-    observations = generic_table_extract("gdebenz", url, html)
-
-    counts = []
-    for pattern in [
-        r"(\d+)\s+АЗС\s+на\s+карте",
-        r"(\d+)\s+АЗС\s+со\s+свежими\s+отметками",
-        r"(\d+)\s+свеж",
-    ]:
-        m = re.search(pattern, text, flags=re.I)
-        if m:
-            counts.append(m.group(0))
-
-    if observations:
-        status = "parsed_partial"
-        message = "Источник отдал часть данных в HTML. Нужна проверка качества парсинга."
-        ok = True
-    else:
-        status = "map_dynamic_no_station_rows"
-        message = (
-            "Источник доступен, но конкретные АЗС не извлечены из HTML. "
-            "Вероятно, данные карты подгружаются динамически. "
-            "Для точного ранжирования нужен скрин, ручная выгрузка или отдельный парсер динамических данных."
-        )
-        if counts:
-            message += " Найден общий текстовый сигнал: " + "; ".join(counts)
-        ok = True
 
     return SourceResult(
         source="gdebenz",
-        url=url,
+        url=urls[0],
         role="availability",
-        ok=ok,
-        status=status,
+        ok=False,
+        status="source_unavailable",
         checked_at=checked_at,
-        http_status=http_status,
-        message=message,
-        observations=observations,
-        raw_hash=text_hash(text[:200000]),
+        http_status=None,
+        message=(
+            "Не удалось открыть gdebenz ни по основному, ни по www-домену. "
+            "Вероятная причина: DNS/геодоступность/временная недоступность из GitHub Actions. "
+            "Ошибки: " + " | ".join(errors[-4:])
+        ),
     )
 
 
@@ -229,14 +385,17 @@ def parse_russiabase() -> SourceResult:
         )
 
     observations = generic_table_extract("russiabase", url, html)
+    if not observations:
+        observations = extract_json_like_ai95("russiabase", url, html)
+
     soup = BeautifulSoup(html, "html.parser")
     text = clean(soup.get_text(" "))
 
     if observations:
         status = "parsed_partial"
         message = (
-            "Найдены строки с АИ-95. Проверьте, какие колонки соответствуют цене, наличию и ограничениям, "
-            "и уточните парсер под фактическую HTML-структуру."
+            "Найдены частичные строки/фрагменты с АИ-95. "
+            "Проверьте, какие поля соответствуют цене, наличию и ограничениям, затем уточните парсер."
         )
     else:
         status = "no_station_rows"
@@ -276,6 +435,9 @@ def parse_price_source(name: str, url: str) -> SourceResult:
         )
 
     observations = generic_table_extract(name, url, html)
+    if not observations:
+        observations = extract_json_like_ai95(name, url, html)
+
     soup = BeautifulSoup(html, "html.parser")
     text = clean(soup.get_text(" "))
 
@@ -310,10 +472,6 @@ def external_only_source(name: str, url: str, role: str, message: str) -> Source
 
 
 def compute_recommendations(source_results: list[SourceResult]) -> list[dict[str, Any]]:
-    """
-    Простое объединение наблюдений. Без координат и достоверного времени отметки
-    не выдаём жёсткую рекомендацию "ехать сюда".
-    """
     observations: list[dict[str, Any]] = []
     for src in source_results:
         observations.extend(src.observations)
@@ -321,12 +479,12 @@ def compute_recommendations(source_results: list[SourceResult]) -> list[dict[str
     if not observations:
         return []
 
-    # Группировка по грубому ключу, чтобы не плодить дубли.
     grouped: dict[str, dict[str, Any]] = {}
     for obs in observations:
         key = clean((obs.get("station_name") or "") + " " + (obs.get("address") or "")).lower()
         if not key:
             key = obs.get("source", "unknown") + str(len(grouped))
+
         cur = grouped.setdefault(
             key,
             {
@@ -341,11 +499,16 @@ def compute_recommendations(source_results: list[SourceResult]) -> list[dict[str
                 "notes": [],
             },
         )
+
         cur["confidence"] = max(float(cur["confidence"]), float(obs.get("confidence") or 0))
-        cur["sources"].append(obs.get("source"))
+        src = obs.get("source")
+        if src and src not in cur["sources"]:
+            cur["sources"].append(src)
+
         if obs.get("price_rub") and not cur.get("price_rub"):
             cur["price_rub"] = obs.get("price_rub")
-        if obs.get("note"):
+
+        if obs.get("note") and obs["note"] not in cur["notes"]:
             cur["notes"].append(obs["note"])
 
     rows = list(grouped.values())
@@ -376,7 +539,7 @@ def main() -> int:
             "yandex_maps_traffic",
             "https://yandex.ru/maps/50/perm/probki/",
             "traffic",
-            "Слой пробок полезен как косвенный сигнал очереди у АЗС, но не подтверждает наличие АИ-95. Для автоматизации нужен официальный доступ к API/скрин.",
+            "Слой пробок полезен как косвенный сигнал очереди у АЗС, но не подтверждает наличие АИ-95. Для автоматизации нужен официальный доступ к API или скрин.",
         ),
         external_only_source(
             "2gis_traffic",
@@ -392,7 +555,7 @@ def main() -> int:
 
     generated_at = now_iso()
     payload = {
-        "schema_version": "0.1",
+        "schema_version": "0.2",
         "city": CITY,
         "fuel": FUEL,
         "generated_at": generated_at,
