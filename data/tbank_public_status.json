@@ -1,15 +1,15 @@
 {
-  "generated_at": "2026-07-11T15:17:17.346Z",
+  "generated_at": "2026-07-11T16:13:37.282Z",
   "url": "https://toplivo.tbank.ru/",
   "screenshot_path": "screenshots/tbank-public.png",
   "ok": true,
   "status": "parsed_public_site",
   "observations_count": 151,
-  "precise_count": 23,
-  "coordinate_count": 22,
+  "precise_count": 22,
+  "coordinate_count": 21,
   "house_count": 1,
-  "street_only_count": 80,
-  "message": "Т-Банк: собрано 151; точных: 23; с координатами: 22; с домом: 1; только улица: 80.",
+  "street_only_count": 81,
+  "message": "Т-Банк: собрано 151; точных: 22; с координатами: 21; с домом: 1; только улица: 81.",
   "page_error": null,
   "network_notes": [
     {
@@ -55,17 +55,17 @@
       "content_type": "application/json; charset=utf-8",
       "status": 200,
       "parsed": true,
-      "added": 127
+      "added": 128
     },
     {
-      "url": "https://www.tbank.ru/api/common/v1/webuser?wuid=feb3fb7569c1a957e216fba20797aaeb",
+      "url": "https://www.tbank.ru/api/common/v1/webuser?wuid=05d0c1c926ddde2588e22b7998d335e7",
       "content_type": "application/json",
       "status": 200,
       "parsed": false,
       "added": 0
     },
     {
-      "url": "https://www.tbank.ru/api/common/v1/webuser?wuid=feb3fb7569c1a957e216fba20797aaeb",
+      "url": "https://www.tbank.ru/api/common/v1/webuser?wuid=05d0c1c926ddde2588e22b7998d335e7",
       "content_type": "application/json",
       "status": 200,
       "parsed": false,
@@ -108,6 +108,12 @@
       "parsed": false
     },
     {
+      "url": "https://log.api-maps.yandex.ru/csp-check",
+      "content_type": "",
+      "status": 200,
+      "parsed": false
+    },
+    {
       "url": "https://cdn.tbank.ru/eventea/v4/pwa.json",
       "content_type": "application/json",
       "status": 200,
@@ -122,7 +128,7 @@
       "added": 0
     },
     {
-      "url": "https://api-maps.yandex.ru/services/coverage/v2?l=map&ll=37.56665471666666%2C55.75498519332701&z=13&lang=ru_RU",
+      "url": "https://api-maps.yandex.ru/services/coverage/v2?l=map&ll=37.56661241666672%2C55.754999169993695&z=13&lang=ru_RU",
       "content_type": "application/json; charset=utf-8",
       "status": 200,
       "parsed": false,
@@ -136,57 +142,26 @@
       "added": 0
     },
     {
-      "url": "https://mc.yandex.com/watch/86699705?wmode=7&page-url=https%3A%2F%2Ftoplivo.tbank.ru%2F&nohit=1&charset=utf-8&uah=chu%0A%22HeadlessChrome%22%3Bv%3D%22149%22%2C%22Chromium%22%3Bv%3D%22149%22%2C%22Not)A%3BBrand%22%3Bv%3D%2224%22%0Acha%0Ax86%0Achb%0A64%0Achf%0A149.0.7827.55%0Achl%0A%22HeadlessChrome%22%3Bv%3D%22149.0.7827.55%22%2C%22Chromium%22%3Bv%3D%22149.0.7827.55%22%2C%22Not)A%3BBrand%22%3Bv%3D%2224.0.0.0%22%0Achm%0A%3F0%0Achp%0AWindows%0Achv%0A10.0&browser-info=pv%3A1%3Avf%3Acxcvitzjebe1sfh1wqh5e2qpo9rrv%3Afu%3A0%3Aen%3Autf-8%3Ala%3Aru-RU%3Av%3A2581%3Acn%3A1%3Adp%3A0%3Als%3A1208722679414%3Ahid%3A332777287%3Az%3A300%3Ai%3A20260711201651%3Aet%3A1783783012%3Ac%3A1%3Arn%3A410069088%3Au%3A1783783012949448566%3Aw%3A1500x1000%3As%3A1500x1000x24%3Ask%3A1%3Awv%3A2%3Aco%3A0%3Ahdl%3A1%3Antf%3A1%3Ans%3A1783783007127%3Aadb%3A2%3Arqnl%3A1%3Ast%3A1783783012%3At%3A%D0%93%D0%B4%D0%B5%20%D0%BA%D1%83%D0%BF%D0%B8%D1%82%D1%8C%20%D0%B1%D0%B5%D0%BD%D0%B7%D0%B8%D0%BD%20%D1%81%D0%B5%D0%B3%D0%BE%D0%B4%D0%BD%D1%8F%3A%20%D0%BA%D0%B0%D1%80%D1%82%D0%B0%20%D0%BD%D0%B0%D0%BB%D0%B8%D1%87%D0%B8%D1%8F%20%D1%82%D0%BE%D0%BF%D0%BB%D0%B8%D0%B2%D0%B0%20%D0%BD%D0%B0%20%D0%90%D0%97%D0%A1%20%D0%9C%D0%BE%D1%81%D0%BA%D0%B2%D1%8B%20%D0%B8%20%D0%A0%D0%BE%D1%81%D1%81%D0%B8%D0%B8%20%E2%80%94%20%D0%A2%E2%80%91%D0%91%D0%B0%D0%BD%D0%BA&t=clt(1206)gdpr(14)clc(0-0-0)aw(1)rcm(1)cdl(na)eco(46211604)ti(1)",
+      "url": "https://mc.yandex.com/watch/86699705?wmode=7&page-url=https%3A%2F%2Ftoplivo.tbank.ru%2F&nohit=1&charset=utf-8&uah=chu%0A%22HeadlessChrome%22%3Bv%3D%22149%22%2C%22Chromium%22%3Bv%3D%22149%22%2C%22Not)A%3BBrand%22%3Bv%3D%2224%22%0Acha%0Ax86%0Achb%0A64%0Achf%0A149.0.7827.55%0Achl%0A%22HeadlessChrome%22%3Bv%3D%22149.0.7827.55%22%2C%22Chromium%22%3Bv%3D%22149.0.7827.55%22%2C%22Not)A%3BBrand%22%3Bv%3D%2224.0.0.0%22%0Achm%0A%3F0%0Achp%0AWindows%0Achv%0A10.0&browser-info=pv%3A1%3Avf%3Acxcvitzjebe1sfh1wqh5e2qpo9rrv%3Afu%3A0%3Aen%3Autf-8%3Ala%3Aru-RU%3Av%3A2581%3Acn%3A1%3Adp%3A0%3Als%3A1187965893641%3Ahid%3A245106088%3Az%3A300%3Ai%3A20260711211311%3Aet%3A1783786391%3Ac%3A1%3Arn%3A895285664%3Au%3A178378639141477817%3Aw%3A1500x1000%3As%3A1500x1000x24%3Ask%3A1%3Awv%3A2%3Aco%3A0%3Ahdl%3A1%3Antf%3A1%3Ans%3A1783786387882%3Aadb%3A2%3Arqnl%3A1%3Ast%3A1783786392%3At%3A%D0%93%D0%B4%D0%B5%20%D0%BA%D1%83%D0%BF%D0%B8%D1%82%D1%8C%20%D0%B1%D0%B5%D0%BD%D0%B7%D0%B8%D0%BD%20%D1%81%D0%B5%D0%B3%D0%BE%D0%B4%D0%BD%D1%8F%3A%20%D0%BA%D0%B0%D1%80%D1%82%D0%B0%20%D0%BD%D0%B0%D0%BB%D0%B8%D1%87%D0%B8%D1%8F%20%D1%82%D0%BE%D0%BF%D0%BB%D0%B8%D0%B2%D0%B0%20%D0%BD%D0%B0%20%D0%90%D0%97%D0%A1%20%D0%9C%D0%BE%D1%81%D0%BA%D0%B2%D1%8B%20%D0%B8%20%D0%A0%D0%BE%D1%81%D1%81%D0%B8%D0%B8%20%E2%80%94%20%D0%A2%E2%80%91%D0%91%D0%B0%D0%BD%D0%BA&t=clt(1021)gdpr(14)clc(0-0-0)aw(1)rcm(1)cdl(na)eco(46211604)ti(1)",
       "content_type": "",
       "status": 302,
       "parsed": false
     },
     {
-      "url": "https://core-renderer-tiles.maps.yandex.net/tiles?l=map&x=5373&y=2474&z=13&scale=1&lang=ru_RU&v=26.07.11-0~b:260630145600~ia:26.05.27-0~ib:26.07.11-0&apikey=8f1ff581-4bdf-4156-b85f-046741fc834d&style=tags.any:poi;transit|elements:label|stylers.visibility:off",
-      "content_type": "image/png",
-      "status": 200,
-      "parsed": false
-    },
-    {
-      "url": "https://eye.targetads.io/web/collect?dl=https%3A%2F%2Ftoplivo.tbank.ru%2F&ref=&ul=ru-ru&ww=1500&wh=1000&dt=%D0%93%D0%B4%D0%B5+%D0%BA%D1%83%D0%BF%D0%B8%D1%82%D1%8C+%D0%B1%D0%B5%D0%BD%D0%B7%D0%B8%D0%BD+%D1%81%D0%B5%D0%B3%D0%BE%D0%B4%D0%BD%D1%8F%3A+%D0%BA%D0%B0%D1%80%D1%82%D0%B0+%D0%BD%D0%B0%D0%BB%D0%B8%D1%87%D0%B8%D1%8F+%D1%82%D0%BE%D0%BF%D0%BB%D0%B8%D0%B2%D0%B0+%D0%BD%D0%B0+%D0%90%D0%97%D0%A1+%D0%9C%D0%BE%D1%81%D0%BA%D0%B2%D1%8B+%D0%B8+%D0%A0%D0%BE%D1%81%D1%81%D0%B8%D0%B8+%E2%80%94+%D0%A2%E2%80%91%D0%91%D0%B0%D0%BD%D0%BA&pid=12486&cid=TA-1783783010577-QGFG04NZ&yandexuid=&edttm=1783783011&sid=-467666762&ss=1",
+      "url": "https://eye.targetads.io/web/collect?dl=https%3A%2F%2Ftoplivo.tbank.ru%2F&ref=&ul=ru-ru&ww=1500&wh=1000&dt=%D0%93%D0%B4%D0%B5+%D0%BA%D1%83%D0%BF%D0%B8%D1%82%D1%8C+%D0%B1%D0%B5%D0%BD%D0%B7%D0%B8%D0%BD+%D1%81%D0%B5%D0%B3%D0%BE%D0%B4%D0%BD%D1%8F%3A+%D0%BA%D0%B0%D1%80%D1%82%D0%B0+%D0%BD%D0%B0%D0%BB%D0%B8%D1%87%D0%B8%D1%8F+%D1%82%D0%BE%D0%BF%D0%BB%D0%B8%D0%B2%D0%B0+%D0%BD%D0%B0+%D0%90%D0%97%D0%A1+%D0%9C%D0%BE%D1%81%D0%BA%D0%B2%D1%8B+%D0%B8+%D0%A0%D0%BE%D1%81%D1%81%D0%B8%D0%B8+%E2%80%94+%D0%A2%E2%80%91%D0%91%D0%B0%D0%BD%D0%BA&pid=12486&cid=TA-1783786390525-0OHNMBCQ&yandexuid=&edttm=1783786391&sid=443389685&ss=1",
       "content_type": "text/plain; charset=utf-8",
       "status": 200,
       "parsed": false
     },
     {
-      "url": "https://mc.yandex.com/watch/86699705/1?wmode=7&page-url=https%3A%2F%2Ftoplivo.tbank.ru%2F&nohit=1&charset=utf-8&uah=chu%0A%22HeadlessChrome%22%3Bv%3D%22149%22%2C%22Chromium%22%3Bv%3D%22149%22%2C%22Not%29A%3BBrand%22%3Bv%3D%2224%22%0Acha%0Ax86%0Achb%0A64%0Achf%0A149.0.7827.55%0Achl%0A%22HeadlessChrome%22%3Bv%3D%22149.0.7827.55%22%2C%22Chromium%22%3Bv%3D%22149.0.7827.55%22%2C%22Not%29A%3BBrand%22%3Bv%3D%2224.0.0.0%22%0Achm%0A%3F0%0Achp%0AWindows%0Achv%0A10.0&browser-info=pv%3A1%3Avf%3Acxcvitzjebe1sfh1wqh5e2qpo9rrv%3Afu%3A0%3Aen%3Autf-8%3Ala%3Aru-RU%3Av%3A2581%3Acn%3A1%3Adp%3A0%3Als%3A1208722679414%3Ahid%3A332777287%3Az%3A300%3Ai%3A20260711201651%3Aet%3A1783783012%3Ac%3A1%3Arn%3A410069088%3Au%3A1783783012949448566%3Aw%3A1500x1000%3As%3A1500x1000x24%3Ask%3A1%3Awv%3A2%3Aco%3A0%3Ahdl%3A1%3Antf%3A1%3Ans%3A1783783007127%3Aadb%3A2%3Arqnl%3A1%3Ast%3A1783783012%3At%3A%D0%93%D0%B4%D0%B5%20%D0%BA%D1%83%D0%BF%D0%B8%D1%82%D1%8C%20%D0%B1%D0%B5%D0%BD%D0%B7%D0%B8%D0%BD%20%D1%81%D0%B5%D0%B3%D0%BE%D0%B4%D0%BD%D1%8F%3A%20%D0%BA%D0%B0%D1%80%D1%82%D0%B0%20%D0%BD%D0%B0%D0%BB%D0%B8%D1%87%D0%B8%D1%8F%20%D1%82%D0%BE%D0%BF%D0%BB%D0%B8%D0%B2%D0%B0%20%D0%BD%D0%B0%20%D0%90%D0%97%D0%A1%20%D0%9C%D0%BE%D1%81%D0%BA%D0%B2%D1%8B%20%D0%B8%20%D0%A0%D0%BE%D1%81%D1%81%D0%B8%D0%B8%20%E2%80%94%20%D0%A2%E2%80%91%D0%91%D0%B0%D0%BD%D0%BA&t=clt%281206%29gdpr%2814%29clc%280-0-0%29aw%281%29rcm%281%29cdl%28na%29eco%2846211604%29ti%281%29",
+      "url": "https://mc.yandex.com/watch/86699705/1?wmode=7&page-url=https%3A%2F%2Ftoplivo.tbank.ru%2F&nohit=1&charset=utf-8&uah=chu%0A%22HeadlessChrome%22%3Bv%3D%22149%22%2C%22Chromium%22%3Bv%3D%22149%22%2C%22Not%29A%3BBrand%22%3Bv%3D%2224%22%0Acha%0Ax86%0Achb%0A64%0Achf%0A149.0.7827.55%0Achl%0A%22HeadlessChrome%22%3Bv%3D%22149.0.7827.55%22%2C%22Chromium%22%3Bv%3D%22149.0.7827.55%22%2C%22Not%29A%3BBrand%22%3Bv%3D%2224.0.0.0%22%0Achm%0A%3F0%0Achp%0AWindows%0Achv%0A10.0&browser-info=pv%3A1%3Avf%3Acxcvitzjebe1sfh1wqh5e2qpo9rrv%3Afu%3A0%3Aen%3Autf-8%3Ala%3Aru-RU%3Av%3A2581%3Acn%3A1%3Adp%3A0%3Als%3A1187965893641%3Ahid%3A245106088%3Az%3A300%3Ai%3A20260711211311%3Aet%3A1783786391%3Ac%3A1%3Arn%3A895285664%3Au%3A178378639141477817%3Aw%3A1500x1000%3As%3A1500x1000x24%3Ask%3A1%3Awv%3A2%3Aco%3A0%3Ahdl%3A1%3Antf%3A1%3Ans%3A1783786387882%3Aadb%3A2%3Arqnl%3A1%3Ast%3A1783786392%3At%3A%D0%93%D0%B4%D0%B5%20%D0%BA%D1%83%D0%BF%D0%B8%D1%82%D1%8C%20%D0%B1%D0%B5%D0%BD%D0%B7%D0%B8%D0%BD%20%D1%81%D0%B5%D0%B3%D0%BE%D0%B4%D0%BD%D1%8F%3A%20%D0%BA%D0%B0%D1%80%D1%82%D0%B0%20%D0%BD%D0%B0%D0%BB%D0%B8%D1%87%D0%B8%D1%8F%20%D1%82%D0%BE%D0%BF%D0%BB%D0%B8%D0%B2%D0%B0%20%D0%BD%D0%B0%20%D0%90%D0%97%D0%A1%20%D0%9C%D0%BE%D1%81%D0%BA%D0%B2%D1%8B%20%D0%B8%20%D0%A0%D0%BE%D1%81%D1%81%D0%B8%D0%B8%20%E2%80%94%20%D0%A2%E2%80%91%D0%91%D0%B0%D0%BD%D0%BA&t=clt%281021%29gdpr%2814%29clc%280-0-0%29aw%281%29rcm%281%29cdl%28na%29eco%2846211604%29ti%281%29",
       "content_type": "application/json; charset=utf-8",
       "status": 200,
       "parsed": false,
       "added": 0
     },
     {
-      "url": "https://core-renderer-tiles.maps.yandex.net/tiles?l=map&x=5373&y=2475&z=13&scale=1&lang=ru_RU&v=26.07.11-0~b:260630145600~ia:26.05.27-0~ib:26.07.11-0&apikey=8f1ff581-4bdf-4156-b85f-046741fc834d&style=tags.any:poi;transit|elements:label|stylers.visibility:off",
-      "content_type": "image/png",
-      "status": 200,
-      "parsed": false
-    },
-    {
-      "url": "https://core-renderer-tiles.maps.yandex.net/tiles?l=map&x=5378&y=2473&z=13&scale=1&lang=ru_RU&v=26.07.11-0~b:260630145600~ia:26.05.27-0~ib:26.07.11-0&apikey=8f1ff581-4bdf-4156-b85f-046741fc834d&style=tags.any:poi;transit|elements:label|stylers.visibility:off",
-      "content_type": "image/png",
-      "status": 200,
-      "parsed": false
-    },
-    {
-      "url": "https://toplivo.tbank.ru/api/v1/stations?minLat=57.96746919419561&maxLat=58.05347893328732&minLon=56.12145396728512&maxLon=56.37894603271481",
-      "content_type": "application/json; charset=utf-8",
-      "status": 200,
-      "parsed": true,
-      "added": 23
-    },
-    {
-      "url": "https://core-renderer-tiles.maps.yandex.net/tiles?l=map&x=5376&y=2472&z=13&scale=1&lang=ru_RU&v=26.07.11-0~b:260630145600~ia:26.05.27-0~ib:26.07.11-0&apikey=8f1ff581-4bdf-4156-b85f-046741fc834d&style=tags.any:poi;transit|elements:label|stylers.visibility:off",
-      "content_type": "image/png",
-      "status": 200,
-      "parsed": false
-    },
-    {
-      "url": "https://core-renderer-tiles.maps.yandex.net/tiles?l=map&x=5378&y=2475&z=13&scale=1&lang=ru_RU&v=26.07.11-0~b:260630145600~ia:26.05.27-0~ib:26.07.11-0&apikey=8f1ff581-4bdf-4156-b85f-046741fc834d&style=tags.any:poi;transit|elements:label|stylers.visibility:off",
+      "url": "https://core-renderer-tiles.maps.yandex.net/tiles?l=map&x=5374&y=2474&z=13&scale=1&lang=ru_RU&v=26.07.11-0~b:260630145600~ia:26.05.27-0~ib:26.07.11-0&apikey=8f1ff581-4bdf-4156-b85f-046741fc834d&style=tags.any:poi;transit|elements:label|stylers.visibility:off",
       "content_type": "image/png",
       "status": 200,
       "parsed": false
@@ -198,20 +173,7 @@
       "parsed": false
     },
     {
-      "url": "https://core-renderer-tiles.maps.yandex.net/tiles?l=map&x=5373&y=2476&z=13&scale=1&lang=ru_RU&v=26.07.11-0~b:260630145600~ia:26.05.27-0~ib:26.07.11-0&apikey=8f1ff581-4bdf-4156-b85f-046741fc834d&style=tags.any:poi;transit|elements:label|stylers.visibility:off",
-      "content_type": "image/png",
-      "status": 200,
-      "parsed": false
-    },
-    {
-      "url": "https://mc.yandex.com/watch/86699705?wmode=7&page-url=https%3A%2F%2Ftoplivo.tbank.ru%2F&charset=utf-8&site-info=%7B%22UserID%22%3A%22feb3fb7569c1a957e216fba20797aaeb%22%7D&uah=chu%0A%22HeadlessChrome%22%3Bv%3D%22149%22%2C%22Chromium%22%3Bv%3D%22149%22%2C%22Not)A%3BBrand%22%3Bv%3D%2224%22%0Acha%0Ax86%0Achb%0A64%0Achf%0A149.0.7827.55%0Achl%0A%22HeadlessChrome%22%3Bv%3D%22149.0.7827.55%22%2C%22Chromium%22%3Bv%3D%22149.0.7827.55%22%2C%22Not)A%3BBrand%22%3Bv%3D%2224.0.0.0%22%0Achm%0A%3F0%0Achp%0AWindows%0Achv%0A10.0&hittoken=1783783012_485d0376ce1e382dc3b51ab118e1d9e76e8ae6d56506fc8445cef08b3aae938d&browser-info=pv%3A1%3Aar%3A1%3Avf%3Acxcvitzjebe1sfh1wqh5e2qpo9rrv%3Afu%3A0%3Aen%3Autf-8%3Ala%3Aru-RU%3Av%3A2581%3Acn%3A1%3Adp%3A1%3Als%3A1208722679414%3Ahid%3A332777287%3Az%3A300%3Ai%3A20260711201652%3Aet%3A1783783013%3Ac%3A1%3Arn%3A652811748%3Arqn%3A2%3Au%3A1783783012949448566%3Aw%3A1500x1000%3As%3A1500x1000x24%3Ask%3A1%3Awv%3A2%3Aco%3A0%3Ahdl%3A1%3Antf%3A1%3Ans%3A1783783007127%3Aadb%3A2%3Arqnl%3A1%3Ast%3A1783783013%3At%3A%D0%93%D0%B4%D0%B5%20%D0%BA%D1%83%D0%BF%D0%B8%D1%82%D1%8C%20%D0%B1%D0%B5%D0%BD%D0%B7%D0%B8%D0%BD%20%D1%81%D0%B5%D0%B3%D0%BE%D0%B4%D0%BD%D1%8F%3A%20%D0%BA%D0%B0%D1%80%D1%82%D0%B0%20%D0%BD%D0%B0%D0%BB%D0%B8%D1%87%D0%B8%D1%8F%20%D1%82%D0%BE%D0%BF%D0%BB%D0%B8%D0%B2%D0%B0%20%D0%BD%D0%B0%20%D0%90%D0%97%D0%A1%20%D0%9C%D0%BE%D1%81%D0%BA%D0%B2%D1%8B%20%D0%B8%20%D0%A0%D0%BE%D1%81%D1%81%D0%B8%D0%B8%20%E2%80%94%20%D0%A2%E2%80%91%D0%91%D0%B0%D0%BD%D0%BA&t=gdpr(14)mc(p-2-ui-1-h-1-up-1)clc(0-0-0)rqnt(2)aw(1)rcm(1)cdl(na)eco(46211604)ti(1)",
-      "content_type": "application/json; charset=utf-8",
-      "status": 200,
-      "parsed": false,
-      "added": 0
-    },
-    {
-      "url": "https://core-renderer-tiles.maps.yandex.net/tiles?l=map&x=5375&y=2474&z=13&scale=1&lang=ru_RU&v=26.07.11-0~b:260630145600~ia:26.05.27-0~ib:26.07.11-0&apikey=8f1ff581-4bdf-4156-b85f-046741fc834d&style=tags.any:poi;transit|elements:label|stylers.visibility:off",
+      "url": "https://core-renderer-tiles.maps.yandex.net/tiles?l=map&x=5374&y=2473&z=13&scale=1&lang=ru_RU&v=26.07.11-0~b:260630145600~ia:26.05.27-0~ib:26.07.11-0&apikey=8f1ff581-4bdf-4156-b85f-046741fc834d&style=tags.any:poi;transit|elements:label|stylers.visibility:off",
       "content_type": "image/png",
       "status": 200,
       "parsed": false
@@ -223,44 +185,39 @@
       "parsed": false
     },
     {
-      "url": "https://api-maps.yandex.ru/services/coverage/v2?l=map&ll=56.25019999999997%2C58.010499999991666&z=13&lang=ru_RU",
-      "content_type": "application/json; charset=utf-8",
-      "status": 200,
-      "parsed": false,
-      "added": 0
-    },
-    {
-      "url": "https://core-renderer-tiles.maps.yandex.net/tiles?l=map&x=5376&y=2474&z=13&scale=1&lang=ru_RU&v=26.07.11-0~b:260630145600~ia:26.05.27-0~ib:26.07.11-0&apikey=8f1ff581-4bdf-4156-b85f-046741fc834d&style=tags.any:poi;transit|elements:label|stylers.visibility:off",
-      "content_type": "image/png",
-      "status": 200,
-      "parsed": false
-    },
-    {
-      "url": "https://mc.yandex.com/watch/86699705/1?page-url=https%3A%2F%2Ftoplivo.tbank.ru%2F&charset=utf-8&uah=chu%0A%22HeadlessChrome%22%3Bv%3D%22149%22%2C%22Chromium%22%3Bv%3D%22149%22%2C%22Not)A%3BBrand%22%3Bv%3D%2224%22%0Acha%0Ax86%0Achb%0A64%0Achf%0A149.0.7827.55%0Achl%0A%22HeadlessChrome%22%3Bv%3D%22149.0.7827.55%22%2C%22Chromium%22%3Bv%3D%22149.0.7827.55%22%2C%22Not)A%3BBrand%22%3Bv%3D%2224.0.0.0%22%0Achm%0A%3F0%0Achp%0AWindows%0Achv%0A10.0&hidv2=3910090895472984239&hittoken=1783783012_485d0376ce1e382dc3b51ab118e1d9e76e8ae6d56506fc8445cef08b3aae938d&browser-info=pa%3A1%3Aar%3A1%3Avf%3Acxcvitzjebe1sfh1wqh5e2qpo9rrv%3Afu%3A0%3Aen%3Autf-8%3Ala%3Aru-RU%3Av%3A2581%3Acn%3A1%3Adp%3A1%3Als%3A1208722679414%3Ahid%3A332777287%3Az%3A300%3Ai%3A20260711201652%3Aet%3A1783783013%3Ac%3A1%3Arn%3A871850286%3Arqn%3A1%3Au%3A1783783012949448566%3Aw%3A1500x1000%3As%3A1500x1000x24%3Ask%3A1%3Afp%3A2316%3Awv%3A2%3Ads%3A2%2C327%2C181%2C1%2C0%2C0%2C%2C1483%2C0%2C2989%2C2989%2C1%2C2838%3Aco%3A0%3Ahdl%3A1%3Antf%3A1%3Ans%3A1783783007127%3Aadb%3A2%3Arqnl%3A1%3Ast%3A1783783013&t=gdpr(14)mc(p-2-ui-1-h-1-up-1)clc(0-0-0)rqnt(1)aw(1)rcm(1)cdl(na)eco(46211604)ti(0)&force-urlencoded=1&site-info=%7B%22__ym%22%3A%7B%22user_id%22%3A%22feb3fb7569c1a957e216fba20797aaeb%22%7D%7D",
-      "content_type": "image/gif",
-      "status": 200,
-      "parsed": false
-    },
-    {
-      "url": "https://mc.yandex.com/watch/86699705/1?page-url=https%3A%2F%2Ftoplivo.tbank.ru%2F&charset=utf-8&uah=chu%0A%22HeadlessChrome%22%3Bv%3D%22149%22%2C%22Chromium%22%3Bv%3D%22149%22%2C%22Not)A%3BBrand%22%3Bv%3D%2224%22%0Acha%0Ax86%0Achb%0A64%0Achf%0A149.0.7827.55%0Achl%0A%22HeadlessChrome%22%3Bv%3D%22149.0.7827.55%22%2C%22Chromium%22%3Bv%3D%22149.0.7827.55%22%2C%22Not)A%3BBrand%22%3Bv%3D%2224.0.0.0%22%0Achm%0A%3F0%0Achp%0AWindows%0Achv%0A10.0&hidv2=3910090895472984239&hittoken=1783783012_485d0376ce1e382dc3b51ab118e1d9e76e8ae6d56506fc8445cef08b3aae938d&browser-info=pa%3A1%3Aar%3A1%3Avf%3Acxcvitzjebe1sfh1wqh5e2qpo9rrv%3Afu%3A0%3Aen%3Autf-8%3Ala%3Aru-RU%3Av%3A2581%3Acn%3A1%3Adp%3A1%3Als%3A1208722679414%3Ahid%3A332777287%3Az%3A300%3Ai%3A20260711201652%3Aet%3A1783783013%3Ac%3A1%3Arn%3A898028164%3Arqn%3A3%3Au%3A1783783012949448566%3Aw%3A1500x1000%3As%3A1500x1000x24%3Ask%3A1%3Awv%3A2%3Aco%3A0%3Ahdl%3A1%3Antf%3A1%3Ans%3A1783783007127%3Aadb%3A2%3Arqnl%3A1%3Ast%3A1783783013&t=gdpr(14)mc(p-2-ui-1-h-1-up-1)clc(0-0-0)rqnt(3)aw(1)rcm(1)cdl(na)eco(46211604)ti(0)&force-urlencoded=1&site-info=%7B%22__ymu%22%3A%7B%22UserID%22%3A%22feb3fb7569c1a957e216fba20797aaeb%22%7D%7D",
-      "content_type": "image/gif",
-      "status": 200,
-      "parsed": false
-    },
-    {
-      "url": "https://core-renderer-tiles.maps.yandex.net/tiles?l=map&x=5375&y=2476&z=13&scale=1&lang=ru_RU&v=26.07.11-0~b:260630145600~ia:26.05.27-0~ib:26.07.11-0&apikey=8f1ff581-4bdf-4156-b85f-046741fc834d&style=tags.any:poi;transit|elements:label|stylers.visibility:off",
-      "content_type": "image/png",
-      "status": 200,
-      "parsed": false
-    },
-    {
       "url": "https://core-renderer-tiles.maps.yandex.net/tiles?l=map&x=5375&y=2473&z=13&scale=1&lang=ru_RU&v=26.07.11-0~b:260630145600~ia:26.05.27-0~ib:26.07.11-0&apikey=8f1ff581-4bdf-4156-b85f-046741fc834d&style=tags.any:poi;transit|elements:label|stylers.visibility:off",
       "content_type": "image/png",
       "status": 200,
       "parsed": false
     },
     {
-      "url": "https://core-renderer-tiles.maps.yandex.net/tiles?l=map&x=5376&y=2475&z=13&scale=1&lang=ru_RU&v=26.07.11-0~b:260630145600~ia:26.05.27-0~ib:26.07.11-0&apikey=8f1ff581-4bdf-4156-b85f-046741fc834d&style=tags.any:poi;transit|elements:label|stylers.visibility:off",
+      "url": "https://core-renderer-tiles.maps.yandex.net/tiles?l=map&x=5375&y=2474&z=13&scale=1&lang=ru_RU&v=26.07.11-0~b:260630145600~ia:26.05.27-0~ib:26.07.11-0&apikey=8f1ff581-4bdf-4156-b85f-046741fc834d&style=tags.any:poi;transit|elements:label|stylers.visibility:off",
+      "content_type": "image/png",
+      "status": 200,
+      "parsed": false
+    },
+    {
+      "url": "https://toplivo.tbank.ru/api/v1/stations?minLat=57.96746919419561&maxLat=58.05347893328732&minLon=56.121453967285156&maxLon=56.37894603271484",
+      "content_type": "application/json; charset=utf-8",
+      "status": 200,
+      "parsed": true,
+      "added": 22
+    },
+    {
+      "url": "https://core-renderer-tiles.maps.yandex.net/tiles?l=map&x=5374&y=2476&z=13&scale=1&lang=ru_RU&v=26.07.11-0~b:260630145600~ia:26.05.27-0~ib:26.07.11-0&apikey=8f1ff581-4bdf-4156-b85f-046741fc834d&style=tags.any:poi;transit|elements:label|stylers.visibility:off",
+      "content_type": "image/png",
+      "status": 200,
+      "parsed": false
+    },
+    {
+      "url": "https://mc.yandex.com/watch/86699705?wmode=7&page-url=https%3A%2F%2Ftoplivo.tbank.ru%2F&charset=utf-8&site-info=%7B%22UserID%22%3A%2205d0c1c926ddde2588e22b7998d335e7%22%7D&uah=chu%0A%22HeadlessChrome%22%3Bv%3D%22149%22%2C%22Chromium%22%3Bv%3D%22149%22%2C%22Not)A%3BBrand%22%3Bv%3D%2224%22%0Acha%0Ax86%0Achb%0A64%0Achf%0A149.0.7827.55%0Achl%0A%22HeadlessChrome%22%3Bv%3D%22149.0.7827.55%22%2C%22Chromium%22%3Bv%3D%22149.0.7827.55%22%2C%22Not)A%3BBrand%22%3Bv%3D%2224.0.0.0%22%0Achm%0A%3F0%0Achp%0AWindows%0Achv%0A10.0&hittoken=1783786392_20869faa2ff507287550383b11d0c65284fedd4790e1ccf6b0c2ab0d51c31f17&browser-info=pv%3A1%3Aar%3A1%3Avf%3Acxcvitzjebe1sfh1wqh5e2qpo9rrv%3Afu%3A0%3Aen%3Autf-8%3Ala%3Aru-RU%3Av%3A2581%3Acn%3A1%3Adp%3A1%3Als%3A1187965893641%3Ahid%3A245106088%3Az%3A300%3Ai%3A20260711211312%3Aet%3A1783786392%3Ac%3A1%3Arn%3A349336352%3Arqn%3A2%3Au%3A178378639141477817%3Aw%3A1500x1000%3As%3A1500x1000x24%3Ask%3A1%3Awv%3A2%3Aco%3A0%3Ahdl%3A1%3Antf%3A1%3Ans%3A1783786387882%3Aadb%3A2%3Arqnl%3A1%3Ast%3A1783786392%3At%3A%D0%93%D0%B4%D0%B5%20%D0%BA%D1%83%D0%BF%D0%B8%D1%82%D1%8C%20%D0%B1%D0%B5%D0%BD%D0%B7%D0%B8%D0%BD%20%D1%81%D0%B5%D0%B3%D0%BE%D0%B4%D0%BD%D1%8F%3A%20%D0%BA%D0%B0%D1%80%D1%82%D0%B0%20%D0%BD%D0%B0%D0%BB%D0%B8%D1%87%D0%B8%D1%8F%20%D1%82%D0%BE%D0%BF%D0%BB%D0%B8%D0%B2%D0%B0%20%D0%BD%D0%B0%20%D0%90%D0%97%D0%A1%20%D0%9C%D0%BE%D1%81%D0%BA%D0%B2%D1%8B%20%D0%B8%20%D0%A0%D0%BE%D1%81%D1%81%D0%B8%D0%B8%20%E2%80%94%20%D0%A2%E2%80%91%D0%91%D0%B0%D0%BD%D0%BA&t=gdpr(14)mc(p-2-ui-1-h-1-up-1)clc(0-0-0)rqnt(2)aw(1)rcm(1)cdl(na)eco(46211604)ti(1)",
+      "content_type": "application/json; charset=utf-8",
+      "status": 200,
+      "parsed": false,
+      "added": 0
+    },
+    {
+      "url": "https://core-renderer-tiles.maps.yandex.net/tiles?l=map&x=5375&y=2476&z=13&scale=1&lang=ru_RU&v=26.07.11-0~b:260630145600~ia:26.05.27-0~ib:26.07.11-0&apikey=8f1ff581-4bdf-4156-b85f-046741fc834d&style=tags.any:poi;transit|elements:label|stylers.visibility:off",
       "content_type": "image/png",
       "status": 200,
       "parsed": false
@@ -272,13 +229,7 @@
       "parsed": false
     },
     {
-      "url": "https://core-renderer-tiles.maps.yandex.net/tiles?l=map&x=5376&y=2473&z=13&scale=1&lang=ru_RU&v=26.07.11-0~b:260630145600~ia:26.05.27-0~ib:26.07.11-0&apikey=8f1ff581-4bdf-4156-b85f-046741fc834d&style=tags.any:poi;transit|elements:label|stylers.visibility:off",
-      "content_type": "image/png",
-      "status": 200,
-      "parsed": false
-    },
-    {
-      "url": "https://core-renderer-tiles.maps.yandex.net/tiles?l=map&x=5375&y=2472&z=13&scale=1&lang=ru_RU&v=26.07.11-0~b:260630145600~ia:26.05.27-0~ib:26.07.11-0&apikey=8f1ff581-4bdf-4156-b85f-046741fc834d&style=tags.any:poi;transit|elements:label|stylers.visibility:off",
+      "url": "https://core-renderer-tiles.maps.yandex.net/tiles?l=map&x=5376&y=2474&z=13&scale=1&lang=ru_RU&v=26.07.11-0~b:260630145600~ia:26.05.27-0~ib:26.07.11-0&apikey=8f1ff581-4bdf-4156-b85f-046741fc834d&style=tags.any:poi;transit|elements:label|stylers.visibility:off",
       "content_type": "image/png",
       "status": 200,
       "parsed": false
@@ -290,7 +241,25 @@
       "parsed": false
     },
     {
-      "url": "https://core-renderer-tiles.maps.yandex.net/tiles?l=map&x=5373&y=2473&z=13&scale=1&lang=ru_RU&v=26.07.11-0~b:260630145600~ia:26.05.27-0~ib:26.07.11-0&apikey=8f1ff581-4bdf-4156-b85f-046741fc834d&style=tags.any:poi;transit|elements:label|stylers.visibility:off",
+      "url": "https://core-renderer-tiles.maps.yandex.net/tiles?l=map&x=5376&y=2475&z=13&scale=1&lang=ru_RU&v=26.07.11-0~b:260630145600~ia:26.05.27-0~ib:26.07.11-0&apikey=8f1ff581-4bdf-4156-b85f-046741fc834d&style=tags.any:poi;transit|elements:label|stylers.visibility:off",
+      "content_type": "image/png",
+      "status": 200,
+      "parsed": false
+    },
+    {
+      "url": "https://core-renderer-tiles.maps.yandex.net/tiles?l=map&x=5375&y=2472&z=13&scale=1&lang=ru_RU&v=26.07.11-0~b:260630145600~ia:26.05.27-0~ib:26.07.11-0&apikey=8f1ff581-4bdf-4156-b85f-046741fc834d&style=tags.any:poi;transit|elements:label|stylers.visibility:off",
+      "content_type": "image/png",
+      "status": 200,
+      "parsed": false
+    },
+    {
+      "url": "https://core-renderer-tiles.maps.yandex.net/tiles?l=map&x=5376&y=2473&z=13&scale=1&lang=ru_RU&v=26.07.11-0~b:260630145600~ia:26.05.27-0~ib:26.07.11-0&apikey=8f1ff581-4bdf-4156-b85f-046741fc834d&style=tags.any:poi;transit|elements:label|stylers.visibility:off",
+      "content_type": "image/png",
+      "status": 200,
+      "parsed": false
+    },
+    {
+      "url": "https://core-renderer-tiles.maps.yandex.net/tiles?l=map&x=5373&y=2475&z=13&scale=1&lang=ru_RU&v=26.07.11-0~b:260630145600~ia:26.05.27-0~ib:26.07.11-0&apikey=8f1ff581-4bdf-4156-b85f-046741fc834d&style=tags.any:poi;transit|elements:label|stylers.visibility:off",
       "content_type": "image/png",
       "status": 200,
       "parsed": false
@@ -302,37 +271,55 @@
       "parsed": false
     },
     {
+      "url": "https://mc.yandex.com/watch/86699705/1?page-url=https%3A%2F%2Ftoplivo.tbank.ru%2F&charset=utf-8&uah=chu%0A%22HeadlessChrome%22%3Bv%3D%22149%22%2C%22Chromium%22%3Bv%3D%22149%22%2C%22Not)A%3BBrand%22%3Bv%3D%2224%22%0Acha%0Ax86%0Achb%0A64%0Achf%0A149.0.7827.55%0Achl%0A%22HeadlessChrome%22%3Bv%3D%22149.0.7827.55%22%2C%22Chromium%22%3Bv%3D%22149.0.7827.55%22%2C%22Not)A%3BBrand%22%3Bv%3D%2224.0.0.0%22%0Achm%0A%3F0%0Achp%0AWindows%0Achv%0A10.0&hidv2=3910976808889090311&hittoken=1783786392_20869faa2ff507287550383b11d0c65284fedd4790e1ccf6b0c2ab0d51c31f17&browser-info=pa%3A1%3Aar%3A1%3Avf%3Acxcvitzjebe1sfh1wqh5e2qpo9rrv%3Afu%3A0%3Aen%3Autf-8%3Ala%3Aru-RU%3Av%3A2581%3Acn%3A1%3Adp%3A1%3Als%3A1187965893641%3Ahid%3A245106088%3Az%3A300%3Ai%3A20260711211312%3Aet%3A1783786392%3Ac%3A1%3Arn%3A663351224%3Arqn%3A1%3Au%3A178378639141477817%3Aw%3A1500x1000%3As%3A1500x1000x24%3Ask%3A1%3Afp%3A1564%3Awv%3A2%3Ads%3A2%2C279%2C165%2C1%2C0%2C0%2C%2C809%2C0%2C2257%2C2258%2C0%2C1950%3Aco%3A0%3Ahdl%3A1%3Antf%3A1%3Ans%3A1783786387882%3Aadb%3A2%3Arqnl%3A1%3Ast%3A1783786393&t=gdpr(14)mc(p-2-ui-1-h-1-up-1)clc(0-0-0)rqnt(1)aw(1)rcm(1)cdl(na)eco(46211604)ti(0)&force-urlencoded=1&site-info=%7B%22__ym%22%3A%7B%22user_id%22%3A%2205d0c1c926ddde2588e22b7998d335e7%22%7D%7D",
+      "content_type": "image/gif",
+      "status": 200,
+      "parsed": false
+    },
+    {
+      "url": "https://core-renderer-tiles.maps.yandex.net/tiles?l=map&x=5373&y=2474&z=13&scale=1&lang=ru_RU&v=26.07.11-0~b:260630145600~ia:26.05.27-0~ib:26.07.11-0&apikey=8f1ff581-4bdf-4156-b85f-046741fc834d&style=tags.any:poi;transit|elements:label|stylers.visibility:off",
+      "content_type": "image/png",
+      "status": 200,
+      "parsed": false
+    },
+    {
+      "url": "https://mc.yandex.com/watch/86699705/1?page-url=https%3A%2F%2Ftoplivo.tbank.ru%2F&charset=utf-8&uah=chu%0A%22HeadlessChrome%22%3Bv%3D%22149%22%2C%22Chromium%22%3Bv%3D%22149%22%2C%22Not)A%3BBrand%22%3Bv%3D%2224%22%0Acha%0Ax86%0Achb%0A64%0Achf%0A149.0.7827.55%0Achl%0A%22HeadlessChrome%22%3Bv%3D%22149.0.7827.55%22%2C%22Chromium%22%3Bv%3D%22149.0.7827.55%22%2C%22Not)A%3BBrand%22%3Bv%3D%2224.0.0.0%22%0Achm%0A%3F0%0Achp%0AWindows%0Achv%0A10.0&hidv2=3910976808889090311&hittoken=1783786392_20869faa2ff507287550383b11d0c65284fedd4790e1ccf6b0c2ab0d51c31f17&browser-info=pa%3A1%3Aar%3A1%3Avf%3Acxcvitzjebe1sfh1wqh5e2qpo9rrv%3Afu%3A0%3Aen%3Autf-8%3Ala%3Aru-RU%3Av%3A2581%3Acn%3A1%3Adp%3A1%3Als%3A1187965893641%3Ahid%3A245106088%3Az%3A300%3Ai%3A20260711211312%3Aet%3A1783786392%3Ac%3A1%3Arn%3A697447783%3Arqn%3A3%3Au%3A178378639141477817%3Aw%3A1500x1000%3As%3A1500x1000x24%3Ask%3A1%3Awv%3A2%3Aco%3A0%3Ahdl%3A1%3Antf%3A1%3Ans%3A1783786387882%3Aadb%3A2%3Arqnl%3A1%3Ast%3A1783786393&t=gdpr(14)mc(p-2-ui-1-h-1-up-1)clc(0-0-0)rqnt(3)aw(1)rcm(1)cdl(na)eco(46211604)ti(0)&force-urlencoded=1&site-info=%7B%22__ymu%22%3A%7B%22UserID%22%3A%2205d0c1c926ddde2588e22b7998d335e7%22%7D%7D",
+      "content_type": "image/gif",
+      "status": 200,
+      "parsed": false
+    },
+    {
+      "url": "https://core-renderer-tiles.maps.yandex.net/tiles?l=map&x=5373&y=2476&z=13&scale=1&lang=ru_RU&v=26.07.11-0~b:260630145600~ia:26.05.27-0~ib:26.07.11-0&apikey=8f1ff581-4bdf-4156-b85f-046741fc834d&style=tags.any:poi;transit|elements:label|stylers.visibility:off",
+      "content_type": "image/png",
+      "status": 200,
+      "parsed": false
+    },
+    {
+      "url": "https://core-renderer-tiles.maps.yandex.net/tiles?l=map&x=5378&y=2473&z=13&scale=1&lang=ru_RU&v=26.07.11-0~b:260630145600~ia:26.05.27-0~ib:26.07.11-0&apikey=8f1ff581-4bdf-4156-b85f-046741fc834d&style=tags.any:poi;transit|elements:label|stylers.visibility:off",
+      "content_type": "image/png",
+      "status": 200,
+      "parsed": false
+    },
+    {
       "url": "https://core-renderer-tiles.maps.yandex.net/tiles?l=map&x=5376&y=2476&z=13&scale=1&lang=ru_RU&v=26.07.11-0~b:260630145600~ia:26.05.27-0~ib:26.07.11-0&apikey=8f1ff581-4bdf-4156-b85f-046741fc834d&style=tags.any:poi;transit|elements:label|stylers.visibility:off",
       "content_type": "image/png",
       "status": 200,
       "parsed": false
     },
     {
-      "url": "https://core-renderer-tiles.maps.yandex.net/tiles?l=map&x=5377&y=2474&z=13&scale=1&lang=ru_RU&v=26.07.11-0~b:260630145600~ia:26.05.27-0~ib:26.07.11-0&apikey=8f1ff581-4bdf-4156-b85f-046741fc834d&style=tags.any:poi;transit|elements:label|stylers.visibility:off",
+      "url": "https://core-renderer-tiles.maps.yandex.net/tiles?l=map&x=5378&y=2475&z=13&scale=1&lang=ru_RU&v=26.07.11-0~b:260630145600~ia:26.05.27-0~ib:26.07.11-0&apikey=8f1ff581-4bdf-4156-b85f-046741fc834d&style=tags.any:poi;transit|elements:label|stylers.visibility:off",
       "content_type": "image/png",
       "status": 200,
       "parsed": false
     },
     {
-      "url": "https://core-renderer-tiles.maps.yandex.net/tiles?l=map&x=5374&y=2474&z=13&scale=1&lang=ru_RU&v=26.07.11-0~b:260630145600~ia:26.05.27-0~ib:26.07.11-0&apikey=8f1ff581-4bdf-4156-b85f-046741fc834d&style=tags.any:poi;transit|elements:label|stylers.visibility:off",
+      "url": "https://core-renderer-tiles.maps.yandex.net/tiles?l=map&x=5373&y=2473&z=13&scale=1&lang=ru_RU&v=26.07.11-0~b:260630145600~ia:26.05.27-0~ib:26.07.11-0&apikey=8f1ff581-4bdf-4156-b85f-046741fc834d&style=tags.any:poi;transit|elements:label|stylers.visibility:off",
       "content_type": "image/png",
       "status": 200,
       "parsed": false
     },
     {
-      "url": "https://core-renderer-tiles.maps.yandex.net/tiles?l=map&x=5377&y=2475&z=13&scale=1&lang=ru_RU&v=26.07.11-0~b:260630145600~ia:26.05.27-0~ib:26.07.11-0&apikey=8f1ff581-4bdf-4156-b85f-046741fc834d&style=tags.any:poi;transit|elements:label|stylers.visibility:off",
-      "content_type": "image/png",
-      "status": 200,
-      "parsed": false
-    },
-    {
-      "url": "https://core-renderer-tiles.maps.yandex.net/tiles?l=map&x=5377&y=2473&z=13&scale=1&lang=ru_RU&v=26.07.11-0~b:260630145600~ia:26.05.27-0~ib:26.07.11-0&apikey=8f1ff581-4bdf-4156-b85f-046741fc834d&style=tags.any:poi;transit|elements:label|stylers.visibility:off",
-      "content_type": "image/png",
-      "status": 200,
-      "parsed": false
-    },
-    {
-      "url": "https://core-renderer-tiles.maps.yandex.net/tiles?l=map&x=5374&y=2476&z=13&scale=1&lang=ru_RU&v=26.07.11-0~b:260630145600~ia:26.05.27-0~ib:26.07.11-0&apikey=8f1ff581-4bdf-4156-b85f-046741fc834d&style=tags.any:poi;transit|elements:label|stylers.visibility:off",
+      "url": "https://core-renderer-tiles.maps.yandex.net/tiles?l=map&x=5376&y=2472&z=13&scale=1&lang=ru_RU&v=26.07.11-0~b:260630145600~ia:26.05.27-0~ib:26.07.11-0&apikey=8f1ff581-4bdf-4156-b85f-046741fc834d&style=tags.any:poi;transit|elements:label|stylers.visibility:off",
       "content_type": "image/png",
       "status": 200,
       "parsed": false
@@ -344,13 +331,32 @@
       "parsed": false
     },
     {
-      "url": "https://core-renderer-tiles.maps.yandex.net/tiles?l=map&x=5374&y=2473&z=13&scale=1&lang=ru_RU&v=26.07.11-0~b:260630145600~ia:26.05.27-0~ib:26.07.11-0&apikey=8f1ff581-4bdf-4156-b85f-046741fc834d&style=tags.any:poi;transit|elements:label|stylers.visibility:off",
+      "url": "https://core-renderer-tiles.maps.yandex.net/tiles?l=map&x=5377&y=2474&z=13&scale=1&lang=ru_RU&v=26.07.11-0~b:260630145600~ia:26.05.27-0~ib:26.07.11-0&apikey=8f1ff581-4bdf-4156-b85f-046741fc834d&style=tags.any:poi;transit|elements:label|stylers.visibility:off",
+      "content_type": "image/png",
+      "status": 200,
+      "parsed": false
+    },
+    {
+      "url": "https://api-maps.yandex.ru/services/coverage/v2?l=map&ll=56.25020000000001%2C58.010499999991666&z=13&lang=ru_RU",
+      "content_type": "application/json; charset=utf-8",
+      "status": 200,
+      "parsed": false,
+      "added": 0
+    },
+    {
+      "url": "https://core-renderer-tiles.maps.yandex.net/tiles?l=map&x=5377&y=2475&z=13&scale=1&lang=ru_RU&v=26.07.11-0~b:260630145600~ia:26.05.27-0~ib:26.07.11-0&apikey=8f1ff581-4bdf-4156-b85f-046741fc834d&style=tags.any:poi;transit|elements:label|stylers.visibility:off",
       "content_type": "image/png",
       "status": 200,
       "parsed": false
     },
     {
       "url": "https://core-renderer-tiles.maps.yandex.net/tiles?l=map&x=5378&y=2476&z=13&scale=1&lang=ru_RU&v=26.07.11-0~b:260630145600~ia:26.05.27-0~ib:26.07.11-0&apikey=8f1ff581-4bdf-4156-b85f-046741fc834d&style=tags.any:poi;transit|elements:label|stylers.visibility:off",
+      "content_type": "image/png",
+      "status": 200,
+      "parsed": false
+    },
+    {
+      "url": "https://core-renderer-tiles.maps.yandex.net/tiles?l=map&x=5377&y=2473&z=13&scale=1&lang=ru_RU&v=26.07.11-0~b:260630145600~ia:26.05.27-0~ib:26.07.11-0&apikey=8f1ff581-4bdf-4156-b85f-046741fc834d&style=tags.any:poi;transit|elements:label|stylers.visibility:off",
       "content_type": "image/png",
       "status": 200,
       "parsed": false
@@ -375,7 +381,7 @@
       "added": 0
     },
     {
-      "url": "https://log.api-maps.yandex.ru/services/logging/watch/104153047/1?page-url=https%3A%2F%2Ftoplivo.tbank.ru&charset=utf-8&site-info=%5B%7B%223.0%22%3A%7B%22group%22%3A%7B%22init%22%3A%7B%22time%22%3A3728.5%7D%7D%7D%7D%2C%7B%223.0%22%3A%7B%22group%22%3A%7B%22ready%22%3A%7B%22time%22%3A255%7D%7D%7D%7D%2C%7B%223.0%22%3A%7B%22group%22%3A%7B%22module%22%3A%7B%22name%22%3A%22%40yandex%2Fymaps3-reactify%22%7D%7D%7D%7D%2C%7B%223.0%22%3A%7B%22group%22%3A%7B%22create%22%3A%7B%22name%22%3A%7B%22YMap%22%3A%7B%22time%22%3A512.0999999999767%7D%7D%7D%7D%7D%7D%2C%7B%223.0%22%3A%7B%22group%22%3A%7B%22entity%22%3A%7B%22name%22%3A%22YMapDefaultSchemeLayer%22%7D%7D%7D%7D%2C%7B%223.0%22%3A%7B%22group%22%3A%7B%22entity%22%3A%7B%22name%22%3A%22YMapDefaultFeaturesLayer%22%7D%7D%7D%7D%2C%7B%223.0%22%3A%7B%22group%22%3A%7B%22entity%22%3A%7B%22name%22%3A%7B%22YMapFeature%22%3A%7B%22geometry%22%3A%22Point%22%7D%7D%7D%7D%7D%7D%2C%7B%223.0%22%3A%7B%22group%22%3A%7B%22entity%22%3A%7B%22name%22%3A%22YMapMarker%22%7D%7D%7D%7D%2C%7B%223.0%22%3A%7B%22group%22%3A%7B%22observe%22%3A%7B%22once%22%3A%7B%22entity%22%3A%22YMap%22%7D%7D%7D%7D%7D%2C%7B%223.0%22%3A%7B%22group%22%3A%7B%22module%22%3A%7B%22name%22%3A%22%40yandex%2Fymaps3-distribution%22%7D%7D%7D%7D%2C%7B%223.0%22%3A%7B%22group%22%3A%7B%22module%22%3A%7B%22name%22%3A%22%40yandex%2Fymaps3-vector%22%7D%7D%7D%7D%5D&browser-info=pv%3A1%3Aar%3A1%3Aet%3A1783783020%3Ast%3A1783783020%3Arn%3A136100804%3At%3A%3Auniqid%3A8f1ff581-XXXX-046741fc834d",
+      "url": "https://log.api-maps.yandex.ru/services/logging/watch/104153047/1?page-url=https%3A%2F%2Ftoplivo.tbank.ru&charset=utf-8&site-info=%5B%7B%223.0%22%3A%7B%22group%22%3A%7B%22init%22%3A%7B%22time%22%3A2823.7000000000116%7D%7D%7D%7D%2C%7B%223.0%22%3A%7B%22group%22%3A%7B%22ready%22%3A%7B%22time%22%3A157.10000000003492%7D%7D%7D%7D%2C%7B%223.0%22%3A%7B%22group%22%3A%7B%22module%22%3A%7B%22name%22%3A%22%40yandex%2Fymaps3-reactify%22%7D%7D%7D%7D%2C%7B%223.0%22%3A%7B%22group%22%3A%7B%22create%22%3A%7B%22name%22%3A%7B%22YMap%22%3A%7B%22time%22%3A408%7D%7D%7D%7D%7D%7D%2C%7B%223.0%22%3A%7B%22group%22%3A%7B%22entity%22%3A%7B%22name%22%3A%22YMapDefaultSchemeLayer%22%7D%7D%7D%7D%2C%7B%223.0%22%3A%7B%22group%22%3A%7B%22entity%22%3A%7B%22name%22%3A%22YMapDefaultFeaturesLayer%22%7D%7D%7D%7D%2C%7B%223.0%22%3A%7B%22group%22%3A%7B%22entity%22%3A%7B%22name%22%3A%7B%22YMapFeature%22%3A%7B%22geometry%22%3A%22Point%22%7D%7D%7D%7D%7D%7D%2C%7B%223.0%22%3A%7B%22group%22%3A%7B%22entity%22%3A%7B%22name%22%3A%22YMapMarker%22%7D%7D%7D%7D%2C%7B%223.0%22%3A%7B%22group%22%3A%7B%22observe%22%3A%7B%22once%22%3A%7B%22entity%22%3A%22YMap%22%7D%7D%7D%7D%7D%2C%7B%223.0%22%3A%7B%22group%22%3A%7B%22module%22%3A%7B%22name%22%3A%22%40yandex%2Fymaps3-distribution%22%7D%7D%7D%7D%2C%7B%223.0%22%3A%7B%22group%22%3A%7B%22module%22%3A%7B%22name%22%3A%22%40yandex%2Fymaps3-vector%22%7D%7D%7D%7D%5D&browser-info=pv%3A1%3Aar%3A1%3Aet%3A1783786400%3Ast%3A1783786400%3Arn%3A691627523%3At%3A%3Auniqid%3A8f1ff581-XXXX-046741fc834d",
       "content_type": "image/gif",
       "status": 200,
       "parsed": false
@@ -388,20 +394,20 @@
       "added": 0
     },
     {
-      "url": "https://mc.yandex.com/clmap/86699705?page-url=https%3A%2F%2Ftoplivo.tbank.ru%2F&pointer-click=rn%3A31735841%3Ax%3A32751%3Ay%3A32775%3At%3A103%3Ap%3APWAA1AAA%3AX%3A709%3AY%3A98&hidv2=3910090895472984239&browser-info=u%3A1783783012949448566%3Av%3A2581%3Avf%3Acxcvitzjebe1sfh1wqh5e2qpo9rrv%3Arqnl%3A1%3Ast%3A1783783022&t=gdpr(14)ti(1)",
+      "url": "https://mc.yandex.com/clmap/86699705?page-url=https%3A%2F%2Ftoplivo.tbank.ru%2F&pointer-click=rn%3A806864015%3Ax%3A32751%3Ay%3A32775%3At%3A105%3Ap%3APWAA1AAA%3AX%3A709%3AY%3A98&hidv2=3910976808889090311&browser-info=u%3A178378639141477817%3Av%3A2581%3Avf%3Acxcvitzjebe1sfh1wqh5e2qpo9rrv%3Arqnl%3A1%3Ast%3A1783786402&t=gdpr(14)ti(1)",
       "content_type": "image/gif",
       "status": 200,
       "parsed": false
     },
     {
-      "url": "https://toplivo.tbank.ru/api/v1/stations?minLat=57.96746919419561&maxLat=58.05347893328732&minLon=56.12145396728512&maxLon=56.37894603271481&fuelStatus=available",
+      "url": "https://toplivo.tbank.ru/api/v1/stations?minLat=57.96746919419561&maxLat=58.05347893328732&minLon=56.121453967285156&maxLon=56.37894603271484&fuelStatus=available",
       "content_type": "application/json; charset=utf-8",
       "status": 200,
       "parsed": false,
       "added": 0
     },
     {
-      "url": "https://mc.yandex.com/watch/86699705?page-url=https%3A%2F%2Ftoplivo.tbank.ru%2F&charset=utf-8&hidv2=3910090895472984239&hittoken=1783783012_485d0376ce1e382dc3b51ab118e1d9e76e8ae6d56506fc8445cef08b3aae938d&browser-info=nb%3A1%3Acl%3A1065%3Aar%3A1%3Avf%3Acxcvitzjebe1sfh1wqh5e2qpo9rrv%3Afu%3A0%3Aen%3Autf-8%3Ala%3Aru-RU%3Av%3A2581%3Acn%3A1%3Adp%3A1%3Als%3A1208722679414%3Ahid%3A332777287%3Az%3A300%3Ai%3A20260711201717%3Aet%3A1783783037%3Ac%3A1%3Arn%3A992393571%3Arqn%3A4%3Au%3A1783783012949448566%3Aw%3A1500x1000%3As%3A1500x1000x24%3Ask%3A1%3Awv%3A2%3Aco%3A0%3Ahdl%3A1%3Antf%3A1%3Aeu%3A2%3Ans%3A1783783007127%3Aadb%3A2%3Arqnl%3A1%3Ast%3A1783783037&t=gdpr(14)mc(p-2-ui-1-h-1-up-1-ci-1)clc(1-709-98)rqnt(4)aw(1)rcm(1)csu(0)cdl(na)eco(46211604)prs(2)wss(2)w2s(6)evt(1065)fid(160)ti(0)&force-urlencoded=1",
+      "url": "https://mc.yandex.com/watch/86699705?page-url=https%3A%2F%2Ftoplivo.tbank.ru%2F&charset=utf-8&hidv2=3910976808889090311&hittoken=1783786392_20869faa2ff507287550383b11d0c65284fedd4790e1ccf6b0c2ab0d51c31f17&browser-info=nb%3A1%3Acl%3A920%3Aar%3A1%3Avf%3Acxcvitzjebe1sfh1wqh5e2qpo9rrv%3Afu%3A0%3Aen%3Autf-8%3Ala%3Aru-RU%3Av%3A2581%3Acn%3A1%3Adp%3A1%3Als%3A1187965893641%3Ahid%3A245106088%3Az%3A300%3Ai%3A20260711211336%3Aet%3A1783786417%3Ac%3A1%3Arn%3A73664175%3Arqn%3A4%3Au%3A178378639141477817%3Aw%3A1500x1000%3As%3A1500x1000x24%3Ask%3A1%3Awv%3A2%3Aco%3A0%3Ahdl%3A1%3Antf%3A1%3Aeu%3A2%3Ans%3A1783786387882%3Aadb%3A2%3Arqnl%3A1%3Ast%3A1783786417&t=gdpr(14)mc(p-2-ui-1-h-1-up-1-ci-1)clc(1-709-98)rqnt(4)aw(1)rcm(1)csu(0)cdl(na)eco(46211604)prs(2)wss(2)w2s(6)evt(920)fid(170)ti(0)&force-urlencoded=1",
       "content_type": "image/gif",
       "status": 200,
       "parsed": false
