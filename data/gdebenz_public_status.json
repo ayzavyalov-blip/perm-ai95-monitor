@@ -1,11 +1,11 @@
 {
-  "generated_at": "2026-07-20T18:23:20.539Z",
+  "generated_at": "2026-07-20T20:41:53.515Z",
   "url": "https://gdebenz.ru/perm",
   "screenshot_path": "screenshots/gdebenz-public.png",
   "step_screenshots_dir": "screenshots/gdebenz/",
   "ok": false,
   "status": "no_station_rows_from_ui",
-  "city_set": false,
+  "city_set": true,
   "filters_applied": false,
   "cards_found_dom": 0,
   "cards_found_lines": 0,
@@ -13,6 +13,6 @@
   "precise_count": 0,
   "house_count": 0,
   "street_only_count": 0,
-  "message": "ГдеБЕНЗ UI открыт, но карточки не извлечены. city_set=false; filters_applied=false; DOM=0; lines=0. Проверьте screenshots/gdebenz/*.png.",
-  "page_error": "page.goto: Timeout 80000ms exceeded.\nCall log:\n  - navigating to \"https://gdebenz.ru/perm\", waiting until \"domcontentloaded\"\n"
+  "message": "ГдеБЕНЗ UI открыт, но карточки не извлечены. city_set=true; filters_applied=false; DOM=0; lines=0. Проверьте screenshots/gdebenz/*.png.",
+  "page_error": null
 }
