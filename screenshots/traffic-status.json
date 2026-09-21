@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-21T19:30:34.969Z",
+  "generated_at": "2026-09-21T23:20:04.645Z",
   "mode": "station_specific_precise",
   "note": "Скриншоты пробок являются вспомогательным визуальным слоем и не подтверждают наличие АИ-95.",
   "targets": [
@@ -26,8 +26,8 @@
       "ok": true,
       "status": "screenshot_saved",
       "screenshot_path": "screenshots/stations/perm-general-yandex.png",
-      "started_at": "2026-09-21T19:29:37.125Z",
-      "finished_at": "2026-09-21T19:30:00.502Z",
+      "started_at": "2026-09-21T23:18:31.276Z",
+      "finished_at": "2026-09-21T23:18:54.454Z",
       "message": "Скриншот сохранён. Для общего обзора использован /probki с центром Перми."
     },
     {
@@ -36,12 +36,12 @@
       "target_label": "Пермь: общий обзор АЗС АИ-95",
       "query": "АЗС АИ-95 Пермь",
       "url": "https://2gis.ru/perm/search/%D0%90%D0%97%D0%A1%20%D0%90%D0%98-95%20%D0%9F%D0%B5%D1%80%D0%BC%D1%8C?m=0%2C0%2F17&traffic",
-      "ok": true,
-      "status": "screenshot_saved",
+      "ok": false,
+      "status": "screenshot_failed",
       "screenshot_path": "screenshots/stations/perm-general-2gis.png",
-      "started_at": "2026-09-21T19:30:00.502Z",
-      "finished_at": "2026-09-21T19:30:34.939Z",
-      "message": "Скриншот сохранён. Это визуальный слой пробок, не подтверждение наличия АИ-95."
+      "started_at": "2026-09-21T23:18:54.454Z",
+      "finished_at": "2026-09-21T23:20:04.616Z",
+      "message": "page.goto: Timeout 70000ms exceeded.\nCall log:\n  - navigating to \"https://2gis.ru/perm/search/%D0%90%D0%97%D0%A1%20%D0%90%D0%98-95%20%D0%9F%D0%B5%D1%80%D0%BC%D1%8C?m=0%2C0%2F17&traffic\", waiting until \"domcontentloaded\"\n"
     }
   ]
 }
