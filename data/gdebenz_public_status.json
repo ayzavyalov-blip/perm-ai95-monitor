@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-09T09:06:40.756Z",
+  "generated_at": "2026-10-09T16:14:45.803Z",
   "url": "https://gdebenz.ru/perm",
   "screenshot_path": "screenshots/gdebenz-public.png",
   "step_screenshots_dir": "screenshots/gdebenz/",
@@ -7,12 +7,12 @@
   "status": "parsed_public_ui",
   "city_set": true,
   "filters_applied": true,
-  "cards_found_dom": 37,
-  "cards_found_lines": 18,
+  "cards_found_dom": 38,
+  "cards_found_lines": 19,
   "observations_count": 14,
   "precise_count": 0,
   "house_count": 0,
   "street_only_count": 12,
-  "message": "ГдеБЕНЗ UI: собрано 14 карточек; DOM-карт: 37; line-карт: 18; точных: 0; с домом: 0; только улица: 12.",
+  "message": "ГдеБЕНЗ UI: собрано 14 карточек; DOM-карт: 38; line-карт: 19; точных: 0; с домом: 0; только улица: 12.",
   "page_error": null
 }
