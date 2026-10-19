@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-19T15:38:58.800Z",
+  "generated_at": "2026-10-19T21:05:55.728Z",
   "mode": "station_specific_precise",
   "note": "Скриншоты пробок являются вспомогательным визуальным слоем и не подтверждают наличие АИ-95.",
   "targets": [
@@ -26,8 +26,8 @@
       "ok": true,
       "status": "screenshot_saved",
       "screenshot_path": "screenshots/stations/perm-general-yandex.png",
-      "started_at": "2026-10-19T15:38:00.305Z",
-      "finished_at": "2026-10-19T15:38:24.280Z",
+      "started_at": "2026-10-19T21:04:57.913Z",
+      "finished_at": "2026-10-19T21:05:21.321Z",
       "message": "Скриншот сохранён. Для общего обзора использован /probki с центром Перми."
     },
     {
@@ -39,8 +39,8 @@
       "ok": true,
       "status": "screenshot_saved",
       "screenshot_path": "screenshots/stations/perm-general-2gis.png",
-      "started_at": "2026-10-19T15:38:24.280Z",
-      "finished_at": "2026-10-19T15:38:58.752Z",
+      "started_at": "2026-10-19T21:05:21.321Z",
+      "finished_at": "2026-10-19T21:05:55.685Z",
       "message": "Скриншот сохранён. Это визуальный слой пробок, не подтверждение наличия АИ-95."
     }
   ]
